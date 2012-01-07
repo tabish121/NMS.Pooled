@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2C74A762-F175-4475-8C59-4E4C232F176E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>vs2008pooled</RootNamespace>
+    <AssemblyName>vs2008-pooled</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Apache.NMS">
+      <HintPath>lib\Apache.NMS\mono-2.0\Apache.NMS.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="keyfile\NMSKey.snk" />
+    <None Include="LICENSE.txt" />
+    <None Include="NOTICE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="src\main\csharp\ConnectionPool.cs" />
+    <Compile Include="src\main\csharp\PooledConnection.cs" />
+    <Compile Include="src\main\csharp\PooledConnectionFactory.cs" />
+    <Compile Include="src\main\csharp\PooledProducer.cs" />
+    <Compile Include="src\main\csharp\PooledSession.cs" />
+    <Compile Include="src\main\csharp\SessionPool.cs" />
+    <Compile Include="src\main\csharp\CommonAssemblyInfo.cs" />
+    <Compile Include="src\main\csharp\PooledQueueBrowser.cs" />
+    <Compile Include="src\main\csharp\PooledMessageConsumer.cs" />
+    <Compile Include="src\main\csharp\Commons\Pool\ObjectPoolFactory.cs" />
+    <Compile Include="src\main\csharp\Commons\Pool\ObjectPool.cs" />
+    <Compile Include="src\main\csharp\Commons\Pool\BaseObjectPool.cs" />
+    <Compile Include="src\main\csharp\Commons\Pool\PoolableObjectFactory.cs" />
+    <Compile Include="src\main\csharp\Commons\Pool\Impl\BaseObjectPoolConfig.cs" />
+    <Compile Include="src\main\csharp\Commons\Pool\Impl\GenericObjectPoolConfig.cs" />
+    <Compile Include="src\main\csharp\Commons\Pool\Impl\GenericObjectPool.cs" />
+    <Compile Include="src\main\csharp\Commons\Pool\Impl\PooledObject.cs" />
+    <Compile Include="src\main\csharp\Commons\Pool\KeyedPoolableObjectFactory.cs" />
+    <Compile Include="src\main\csharp\Commons\Pool\KeyedObjectPoolFactory.cs" />
+    <Compile Include="src\main\csharp\Commons\Pool\KeyedObjectPool.cs" />
+    <Compile Include="src\main\csharp\Commons\Pool\BasePoolableObjectFactory.cs" />
+    <Compile Include="src\main\csharp\Commons\Pool\BaseKeyedPoolableObjectFactory.cs" />
+    <Compile Include="src\main\csharp\Commons\Pool\PooledObjectState.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\NoSuchElementException.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Concurrent\LinkedBlockingQueue.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Concurrent\LinkedBlockingDeque.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\AbstractCollection.cs" />
+    <Compile Include="src\main\csharp\Util\SessionKey.cs" />
+    <Compile Include="src\main\csharp\Util\ConnectionKey.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Iterable.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Collection.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Deque.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Queue.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Concurrent\BlockingDeque.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Concurrent\BlockingQueue.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Iterator.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\AbstractQueue.cs" />
+    <Compile Include="src\main\csharp\Commons\Pool\Impl\PoolUtils.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\List.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\ListIterator.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\AbstractList.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\ConcurrentModificationException.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\ArrayList.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Arrays.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Set.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\AbstractSet.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\CollectionUtils.cs" />
+    <Compile Include="src\main\csharp\Commons\Pool\Impl\GenericKeyedObjectPool.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Map.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\MapEntry.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Entry.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\AbstractMap.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\HashMap.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\HashSet.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Concurrent\locks\AbstractOwnableSynchronizer.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Concurrent\locks\AbstractQueuedSynchronizer.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\LinkedHashMap.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\LinkedHashSet.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Concurrent\ConcurrentMap.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Concurrent\locks\Condition.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Concurrent\locks\LockSupport.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Concurrent\locks\Lock.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\main\csharp\Util\" />
+    <Folder Include="src\main\csharp\Commons\" />
+    <Folder Include="src\main\csharp\Commons\Collections\" />
+    <Folder Include="src\main\csharp\Commons\Pool\" />
+    <Folder Include="src\main\csharp\Commons\Pool\Impl\" />
+    <Folder Include="src\main\csharp\Commons\Collections\Concurrent\" />
+    <Folder Include="src\main\csharp\Commons\Collections\Concurrent\locks\" />
+  </ItemGroup>
+</Project>

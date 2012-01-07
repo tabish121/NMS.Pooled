@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8B0AFB62-448D-423F-BD6B-547B8F537297}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>vs2008pooledtest</RootNamespace>
+    <AssemblyName>vs2008-pooled-test</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Apache.NMS">
+      <HintPath>lib\Apache.NMS\mono-2.0\Apache.NMS.dll</HintPath>
+    </Reference>
+    <Reference Include="Apache.NMS.Pooled">
+      <HintPath>build\mono-2.0\debug\Apache.NMS.Pooled.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>lib\NUnit\mono-2.0\nunit.framework.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="keyfile\NMSKey.snk" />
+    <None Include="Apache.NMS.Pooled.Test.nunit" />
+    <None Include="nmsprovider-test.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\test\csharp\" />
+    <Folder Include="src\test\csharp\Commons\" />
+    <Folder Include="src\test\csharp\Commons\Collections\" />
+    <Folder Include="src\test\csharp\Commons\Collections\Concurrent\" />
+    <Folder Include="src\test\csharp\Commons\Pool\" />
+    <Folder Include="src\test\csharp\Commons\Pool\Impl\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="src\test\csharp\MessageProducerTest.cs" />
+    <Compile Include="src\test\csharp\CommonAssemblyInfo.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\Concurrent\LinkedBlockingDequeTest.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\Concurrent\ConcurrencyTestCase.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\AbstractCollectionTest.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\AbstractListTest.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\ArrayListTest.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\Concurrent\LinkedBlockingQueueTest.cs" />
+    <Compile Include="src\test\csharp\Commons\Pool\TestObjectPool.cs" />
+    <Compile Include="src\test\csharp\Commons\Pool\MethodCall.cs" />
+    <Compile Include="src\test\csharp\Commons\Pool\MethodCallPoolableObjectFactory.cs" />
+    <Compile Include="src\test\csharp\Commons\Pool\TestObjectPoolFactory.cs" />
+    <Compile Include="src\test\csharp\Commons\Pool\TestBaseKeyedPoolableObjectFactory.cs" />
+    <Compile Include="src\test\csharp\Commons\Pool\TestBaseObjectPool.cs" />
+    <Compile Include="src\test\csharp\Commons\Pool\TestBasePoolableObjectFactory.cs" />
+    <Compile Include="src\test\csharp\Commons\Pool\TestKeyedObjectPool.cs" />
+    <Compile Include="src\test\csharp\Commons\Pool\TestKeyedObjectPoolFactory.cs" />
+    <Compile Include="src\test\csharp\Commons\Pool\TestPoolUtils.cs" />
+    <Compile Include="src\test\csharp\Commons\Pool\Impl\TestGenericObjectPool.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\AbstractMapTest.cs" />
+  </ItemGroup>
+</Project>
