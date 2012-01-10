@@ -99,41 +99,25 @@ namespace Apache.NMS.Pooled.Commons.Collections
             Assert.AreSame(map5.KeySet(), map5.KeySet(), "LinkedHashMap");
         }
 
-//        public void TestRemoveObject()
-//        {
-//            Object key = new Object();
-//            Object value = new Object();
-//
-//            AbstractMap map1 = new HashMap(0);
-//            map1.Put("key", value);
-//            Assert.AreSame("HashMap(0)", map1.Remove("key"), value);
-//
-//            AbstractMap map4 = new IdentityHashMap(1);
-//            map4.Put(key, value);
-//            Assert.AreSame("IdentityHashMap", map4.Remove(key), value);
-//
-//            AbstractMap map5 = new LinkedHashMap(122);
-//            map5.Put(key, value);
-//            Assert.AreSame("LinkedHashMap", map5.Remove(key), value);
-//    
-//            AbstractMap map6 = new TreeMap(new Comparator() {
-//                // Bogus comparator
-//                public int compare(Object object1, Object object2) {
-//                    return 0;
-//                }
-//            });
-//            map6.Put(key, value);
-//            Assert.AreSame("TreeMap", map6.Remove(key), value);
-//    
-//            AbstractMap map7 = new WeakHashMap();
-//            map7.Put(key, value);
-//            Assert.AreSame("WeakHashMap", map7.Remove(key), value);
-//    
-//            AbstractMap aSpecialMap = new MyMap();
-//            aSpecialMap.Put(specialKey, specialValue);
-//            Object valueOut = aSpecialMap.Remove(specialKey);
-//            Assert.AreSame("MyMap", valueOut, specialValue);
-//        }
+        [Test]
+        public void TestRemoveObject()
+        {
+            Object key = new Object();
+            Object val = new Object();
+
+            AbstractMap<Object, Object> map1 = new HashMap<Object, Object>(0);
+            map1.Put("key", val);
+            Assert.AreSame(map1.Remove("key"), val, "HashMap(0)");
+
+            AbstractMap<Object, Object> map5 = new LinkedHashMap<Object, Object>(122);
+            map5.Put(key, val);
+            Assert.AreSame(map5.Remove(key), val, "LinkedHashMap");
+
+            AbstractMap<Object, Object> aSpecialMap = new MyMap();
+            aSpecialMap.Put(specialKey, specialValue);
+            Object valueOut = aSpecialMap.Remove(specialKey);
+            Assert.AreSame(valueOut, specialValue, "MyMap");
+        }
 
         [Test]
         public void TestClear()
@@ -156,59 +140,56 @@ namespace Apache.NMS.Pooled.Commons.Collections
             }
         }
 
-//        public void TestContainsKey()
-//        {
-//            AbstractMap map = new AMT();
-//    
-//            Assert.IsFalse(map.ContainsKey("k"));
-//            Assert.IsFalse(map.ContainsKey(null));
-//    
-//            map.Put("k", "v");
-//            map.Put("key", null);
-//            map.Put(null, "value");
-//            map.Put(null, null);
-//    
-//            Assert.IsTrue(map.ContainsKey("k"));
-//            Assert.IsTrue(map.ContainsKey("key"));
-//            Assert.IsTrue(map.ContainsKey(null));
-//        }
-//    
-//        /**
-//         * @tests java.util.AbstractMap#ContainsValue(Object)
-//         */
-//        public void test_containValue()
-//        {
-//            AbstractMap map = new AMT();
-//    
-//            Assert.IsFalse(map.ContainsValue("v"));
-//            Assert.IsFalse(map.ContainsValue(null));
-//
-//            map.Put("k", "v");
-//            map.Put("key", null);
-//            map.Put(null, "value");
-//    
-//            Assert.IsTrue(map.ContainsValue("v"));
-//            Assert.IsTrue(map.ContainsValue("value"));
-//            Assert.IsTrue(map.ContainsValue(null));
-//        }
-//    
-//        /**
-//         * @tests java.util.AbstractMap#Get(Object)
-//         */
-//        public void test_Get()
-//        {
-//            AbstractMap map = new AMT();
-//            assertNull(map.Get("key"));
-//            assertNull(map.Get(null));
-//    
-//            map.Put("k", "v");
-//            map.Put("key", null);
-//            map.Put(null, "value");
-//    
-//            Assert.AreEqual("v", map.Get("k"));
-//            assertNull(map.Get("key"));
-//            Assert.AreEqual("value", map.Get(null));
-//        }
+        [Test]
+        public void TestContainsKey()
+        {
+            AbstractMap<Object, Object> map = new AMT();
+
+            Assert.IsFalse(map.ContainsKey("k"));
+            Assert.IsFalse(map.ContainsKey(null));
+    
+            map.Put("k", "v");
+            map.Put("key", null);
+            map.Put(null, "value");
+            map.Put(null, null);
+    
+            Assert.IsTrue(map.ContainsKey("k"));
+            Assert.IsTrue(map.ContainsKey("key"));
+            Assert.IsTrue(map.ContainsKey(null));
+        }
+
+        [Test]
+        public void TestContainValue()
+        {
+            AbstractMap<Object, Object> map = new AMT();
+    
+            Assert.IsFalse(map.ContainsValue("v"));
+            Assert.IsFalse(map.ContainsValue(null));
+
+            map.Put("k", "v");
+            map.Put("key", null);
+            map.Put(null, "value");
+    
+            Assert.IsTrue(map.ContainsValue("v"));
+            Assert.IsTrue(map.ContainsValue("value"));
+            Assert.IsTrue(map.ContainsValue(null));
+        }
+
+        [Test]
+        public void TestGet()
+        {
+            AbstractMap<Object, Object> map = new AMT();
+            Assert.IsNull(map.Get("key"));
+            Assert.IsNull(map.Get(null));
+    
+            map.Put("k", "v");
+            map.Put("key", null);
+            map.Put(null, "value");
+
+            Assert.AreEqual("v", map.Get("k"));
+            Assert.IsNull(map.Get("key"));
+            Assert.AreEqual("value", map.Get(null));
+        }
 
         [Test]
         public void TestValues()
@@ -226,115 +207,151 @@ namespace Apache.NMS.Pooled.Commons.Collections
             Assert.AreSame(map5.Values(), map5.Values(), "IdentityHashMap");
         }
 
-//        /**
-//         * @tests java.util.AbstractMap#Clone()
-//         */
-//        public void test_Clone()
-//        {
-//            class MyMap : AbstractMap, Cloneable
-//            {
-//                private Map map = new HashMap();
-//
-//                public Set entrySet() {
-//                    return map.entrySet();
-//                }
-//    
-//                public Object Put(Object key, Object value) {
-//                    return map.Put(key, value);
-//                }
-//    
-//                public Map GetMap() {
-//                    return map;
-//                }
-//
-//                public Object Clone() {
-//                    try {
-//                        return super.Clone();
-//                    } catch (CloneNotSupportedException e) {
-//                        return null;
-//                    }
-//                }
-//            }
-//            ;
-//            MyMap map = new MyMap();
-//            map.Put("one", "1");
-//            Map.Entry entry = (Map.Entry) map.entrySet().iterator().next();
-//            Assert.IsTrue("entry not added", entry.GetKey() == "one"
-//                    && entry.GetValue() == "1");
-//            MyMap mapClone = (MyMap) map.Clone();
-//            Assert.IsTrue("Clone not shallow", map.GetMap() == mapClone.GetMap());
-//        }
-//    
-//        public class AMT extends AbstractMap {
-//    
-//            // Very crude AbstractMap implementation
-//            Vector Values = new Vector();
-//    
-//            Vector keys = new Vector();
-//    
-//            public Set entrySet() {
-//                return new AbstractSet() {
-//                    public Iterator iterator() {
-//                        return new Iterator() {
-//                            int index = 0;
-//    
-//                            public bool hasNext() {
-//                                return index < Values.size();
-//                            }
-//    
-//                            public Object next() {
-//                                if (index < Values.size()) {
-//                                    Map.Entry me = new Map.Entry() {
-//                                        Object v = Values.elementAt(index);
-//    
-//                                        Object k = keys.elementAt(index);
-//
-//                                        public Object GetKey() {
-//                                            return k;
-//                                        }
-//
-//                                        public Object GetValue() {
-//                                            return v;
-//                                        }
-//
-//                                        public Object setValue(Object value) {
-//                                            return null;
-//                                        }
-//                                    };
-//                                    index++;
-//                                    return me;
-//                                }
-//                                return null;
-//                            }
-//
-//                            public void Remove() {
-//                            }
-//                        };
-//                    }
-//    
-//                    public int size() {
-//                        return Values.size();
-//                    }
-//                };
-//            }
-//    
-//            public Object Put(Object k, Object v) {
-//                keys.add(k);
-//                Values.add(v);
-//                return v;
-//            }
-//        }
-//    
-//        /**
-//         * @tests {@link java.util.AbstractMap#PutAll(Map)}
-//         */
-//        public void test_PutAllLMap() {
-//            Hashtable ht = new Hashtable();
-//            AMT amt = new AMT();
-//            ht.Put("this", "that");
-//            amt.PutAll(ht);
-//            Assert.AreEqual("Should be equal", amt, ht);
-//        }
+        class MyClonableMap : AbstractMap<Object, Object>, ICloneable
+        {
+            private Map<Object, Object> map = new HashMap<Object, Object>();
+
+            public override Set<Entry<Object, Object>> EntrySet()
+            {
+                return map.EntrySet();
+            }
+
+            public override Object Put(Object key, Object val)
+            {
+                return map.Put(key, val);
+            }
+
+            public Map<Object, Object> GetMap()
+            {
+                return map;
+            }
+
+            public object Clone()
+            {
+                try
+                {
+                    return (MyClonableMap) base.MemberwiseClone();
+                }
+                catch (InvalidCastException)
+                {
+                    return null;
+                }
+            }
+        }
+
+        [Test]
+        public void TestClone()
+        {
+            MyClonableMap map = new MyClonableMap();
+            map.Put("one", "1");
+            Entry<Object, Object> entry = (Entry<Object, Object>) map.EntrySet().Iterator().Next();
+            Assert.IsTrue(entry.Key.Equals("one") , "entry not added");
+            Assert.IsTrue(entry.Value.Equals("1"), "entry not added");
+            MyClonableMap mapClone = (MyClonableMap) map.Clone();
+            Assert.IsTrue(map.GetMap() == mapClone.GetMap(), "Clone not shallow");
+        }
+
+        public class AMT : AbstractMap<Object, Object>
+        {
+            ArrayList<Object> values = new ArrayList<Object>();
+            ArrayList<Object> keys = new ArrayList<Object>();
+
+            class AMTEntry : MapEntry<Object, Object>
+            {
+                private readonly Object v;
+                private readonly Object k;
+
+                public AMTEntry(int index, AMT parent) : base(null, null)
+                {
+                    this.v = parent.values.Get(index);
+                    this.k = parent.keys.Get(index);
+                }
+
+                public override Object Key
+                {
+                    get { return k; }
+                }
+
+                public override Object Value
+                {
+                    get { return v; }
+                    set { }
+                }
+            };
+
+            class AMTSetIterator : Iterator<Entry<Object, Object>>
+            {
+                private int index = 0;
+                private readonly AMT parent;
+
+                public AMTSetIterator(AMT parent)
+                {
+                    this.parent = parent;
+                }
+
+                public bool HasNext
+                {
+                    get { return index < parent.values.Size(); }
+                }
+
+                public Entry<Object, Object> Next()
+                {
+                    if (index < parent.values.Size())
+                    {
+                        Entry<Object, Object> me = new AMTEntry(index, parent);
+                        index++;
+                        return me;
+                    }
+                    return null;
+                }
+
+                public void Remove()
+                {
+                }
+            }
+
+            class AMTSet : AbstractSet<Entry<Object, Object>>
+            {
+                private readonly AMT parent;
+
+                public AMTSet(AMT parent)
+                {
+                    this.parent = parent;
+                }
+
+                public override Iterator<Entry<Object, Object>> Iterator()
+                {
+                    return new AMTSetIterator(parent);
+                }
+
+                public override int Size()
+                {
+                    return parent.values.Size();
+                }
+            }
+
+            public override Set<Entry<Object, Object>> EntrySet()
+            {
+                return new AMTSet(this);
+            }
+
+            public override Object Put(Object k, Object v)
+            {
+                keys.Add(k);
+                values.Add(v);
+                return v;
+            }
+        }
+
+        [Test]
+        public void TestPutAllLMap()
+        {
+            Map<Object, Object> ht = new HashMap<Object, Object>();
+            Map<Object, Object> amt = new AMT();
+            ht.Put("this", "that");
+            amt.PutAll(ht);
+            Assert.AreEqual(amt, ht, "Should be equal");
+        }
 
         [Test]
         public void TestEqualsWithNullValues()
@@ -351,20 +368,22 @@ namespace Apache.NMS.Pooled.Commons.Collections
             Assert.IsFalse(b.Equals(a));
         }
 
-//        public void testNullsOnViews() {
-//            Map<String, String> nullHostile = new Hashtable<String, String>();
-//    
-//            nullHostile.Put("a", "apple");
-//            testNullsOnView(nullHostile.entrySet());
-//
-//            nullHostile.Put("a", "apple");
-//            testNullsOnView(nullHostile.KeySet());
-//    
-//            nullHostile.Put("a", "apple");
-//            testNullsOnView(nullHostile.Values());
-//        }
+        [Test]
+        public void TestNullsOnViews()
+        {
+            Map<String, String> nullHostile = new HashMap<String, String>();
+    
+            nullHostile.Put("a", "apple");
+            TestNullsOnView(nullHostile.EntrySet());
 
-        private void testNullsOnView(Collection<Object> view)
+            nullHostile.Put("a", "apple");
+            TestNullsOnView(nullHostile.KeySet());
+
+            nullHostile.Put("a", "apple");
+            TestNullsOnView(nullHostile.Values());
+        }
+
+        private void TestNullsOnView(Collection<String> view)
         {
             try
             {
@@ -382,7 +401,45 @@ namespace Apache.NMS.Pooled.Commons.Collections
             {
             }
 
-            Set<Object> setOfNull = CollectionUtils.Singleton<Object>(null);
+            Set<String> setOfNull = CollectionUtils.Singleton<String>(null);
+            Assert.IsFalse(view.Equals(setOfNull));
+
+            try
+            {
+                Assert.IsFalse(view.RemoveAll(setOfNull));
+            }
+            catch (NullReferenceException)
+            {
+            }
+
+            try
+            {
+                Assert.IsTrue(view.RetainAll(setOfNull));
+            }
+            catch (NullReferenceException)
+            {
+            }
+        }
+
+        private void TestNullsOnView(Collection<Entry<String, String>> view)
+        {
+            try
+            {
+                Assert.IsFalse(view.Contains(null));
+            }
+            catch (NullReferenceException)
+            {
+            }
+    
+            try
+            {
+                Assert.IsFalse(view.Remove(null));
+            }
+            catch (NullReferenceException)
+            {
+            }
+
+            Set<Entry<String, String>> setOfNull = CollectionUtils.Singleton<Entry<String, String>>(null);
             Assert.IsFalse(view.Equals(setOfNull));
 
             try
