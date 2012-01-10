@@ -1,0 +1,5 @@
+bin
+build
+lib
+src/main/csharp/CommonAssemblyInfo.cs
+src/test/csharp/CommonAssemblyInfo.cs
