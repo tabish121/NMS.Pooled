@@ -1,27 +1,16 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="src/main/csharp/Commons/Collections/CollectionUtils.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="src/test/csharp/Commons/Collections/AbstractCollectionTest.cs">
     <Files>
-      <File FileName="src/test/csharp/Commons/Collections/AbstractMapTest.cs" Line="78" Column="3" />
-      <File FileName="src/main/csharp/Commons/Collections/MapEntry.cs" Line="46" Column="24" />
-      <File FileName="src/main/csharp/Commons/Collections/CollectionUtils.cs" Line="106" Column="28" />
+      <File FileName="src/test/csharp/Commons/Collections/LinkedHashMapTest.cs" Line="450" Column="17" />
+      <File FileName="src/test/csharp/Commons/Collections/AbstractCollectionTest.cs" Line="20" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="vs2008-pooled" expanded="True">
-            <Node name="References" selected="True" />
-            <Node name="src" expanded="True">
-              <Node name="main" expanded="True">
-                <Node name="csharp" expanded="True">
-                  <Node name="Commons" expanded="True">
-                    <Node name="Collections" expanded="True" />
-                  </Node>
-                </Node>
-              </Node>
-            </Node>
-          </Node>
-          <Node name="vs2008-pooled-test" expanded="True">
+          <Node name="vs2008-pooled" expanded="True" />
+          <Node name="vs2008-pooled-test" expanded="True" selected="True">
+            <Node name="References" expanded="True" />
             <Node name="src" expanded="True">
               <Node name="test" expanded="True">
                 <Node name="csharp" expanded="True">
@@ -44,25 +33,7 @@
         <State selected="True" />
       </Pad>
       <Pad Id="MonoDevelop.NUnit.TestPad">
-        <State expanded="True">
-          <Node name="vs2008-pooled-test" expanded="True">
-            <Node name="Apache" expanded="True">
-              <Node name="NMS" expanded="True">
-                <Node name="Pooled" expanded="True">
-                  <Node name="Commons" expanded="True">
-                    <Node name="Pool" expanded="True">
-                      <Node name="Impl" expanded="True">
-                        <Node name="TestGenericObjectPool" expanded="True">
-                          <Node name="TestEvictFIFO" selected="True" />
-                        </Node>
-                      </Node>
-                    </Node>
-                  </Node>
-                </Node>
-              </Node>
-            </Node>
-          </Node>
-        </State>
+        <State expanded="True" selected="True" />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>

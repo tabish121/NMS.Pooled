@@ -553,6 +553,18 @@ namespace Apache.NMS.Pooled.Commons.Collections
             }
             return valuesCollection;
         }
+
+        /// <summary>
+        /// Returns a new instance of the same class as this instance, whose slots
+        /// have been filled in with the values of the slots of this instance.
+        /// </summary>
+        public virtual Object Clone()
+        {
+            AbstractMap<K, V> result = (AbstractMap<K, V>) base.MemberwiseClone();
+            result.keySet = null;
+            result.valuesCollection = null;
+            return result;
+        }
     }
 }
 

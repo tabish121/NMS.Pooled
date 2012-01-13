@@ -190,47 +190,45 @@ namespace Apache.NMS.Pooled.Commons.Collections
             }
         }
 
-//        [Test]
-//        public void TestClone()
-//        {
-//            // Test for method java.lang.Object java.util.HashMap.Clone()
-//            HashMap<Object, Object> hm2 = (HashMap<Object, Object>) hm.Clone();
-//            Assert.IsTrue("Clone answered equivalent HashMap", hm2 != hm);
-//            for (int counter = 0; counter < hmSize; counter++)
-//            {
-//                 Assert.IsTrue(hm.Get(objArray2[counter]) == hm2.Get(objArray2[counter]), "Clone answered unequal HashMap");
-//            }
-//
-//            HashMap<Object, Object> map = new HashMap<Object, Object>();
-//            map.Put("key", "value");
-//            // get the KeySet() and Values() on the original Map
-//            Set<Object> keys = map.KeySet();
-//            Collection<Object> values = map.Values();
-//            Assert.AreEqual("Values() does not work", "value", values.Iterator().Next());
-//            Assert.AreEqual("KeySet() does not work", "key", keys.Iterator().Next());
-//            AbstractMap<Object, Object> map2 = (AbstractMap<Object, Object>) map.Clone();
-//            map2.Put("key", "value2");
-//            Collection<Object> values2 = map2.Values();
-//            Assert.IsTrue("Values() is identical", values2 != values);
-//            // Values() and KeySet() on the Cloned() map should be different
-//            Assert.AreEqual("Values() was not Cloned", "value2", values2.Iterator().Next());
-//            map2.Clear();
-//            map2.Put("key2", "value3");
-//            Set<Object> key2 = map2.KeySet();
-//            Assert.IsTrue("KeySet() is identical", key2 != keys);
-//            Assert.AreEqual("KeySet() was not Cloned", "key2", key2.Iterator().Next());
-//
-//            // regresion test for HARMONY-4603
-//            HashMap<Object, Object> hashmap = new HashMap<Object, Object>();
-//            MockClonable mock = new MockClonable(1);
-//            hashmap.Put(1, mock);
-//            Assert.AreEqual(1, ((MockClonable) hashmap.Get(1)).i);
-//            HashMap<Object, Object> hm3 = (HashMap<Object, Object>)hashmap.Clone();
-//            Assert.AreEqual(1, ((MockClonable) hm3.Get(1)).i);
-//            mock.i = 0;
-//            Assert.AreEqual(0, ((MockClonable) hashmap.Get(1)).i);
-//            Assert.AreEqual(0, ((MockClonable) hm3.Get(1)).i);
-//         }
+        [Test]
+        public void TestClone()
+        {
+            HashMap<Object, Object> hm2 = (HashMap<Object, Object>) hm.Clone();
+            Assert.IsTrue(hm2 != hm, "Clone answered equivalent HashMap");
+            for (int counter = 0; counter < hmSize; counter++)
+            {
+                 Assert.IsTrue(hm.Get(objArray2[counter]) == hm2.Get(objArray2[counter]), "Clone answered unequal HashMap");
+            }
+
+            HashMap<Object, Object> map = new HashMap<Object, Object>();
+            map.Put("key", "value");
+            // get the KeySet() and Values() on the original Map
+            Set<Object> keys = map.KeySet();
+            Collection<Object> values = map.Values();
+            Assert.AreEqual("value", values.Iterator().Next(), "Values() does not work");
+            Assert.AreEqual("key", keys.Iterator().Next(), "KeySet() does not work");
+            AbstractMap<Object, Object> map2 = (AbstractMap<Object, Object>) map.Clone();
+            map2.Put("key", "value2");
+            Collection<Object> values2 = map2.Values();
+            Assert.IsTrue(values2 != values, "Values() is identical");
+            // Values() and KeySet() on the Cloned() map should be different
+            Assert.AreEqual("value2", values2.Iterator().Next(), "Values() was not Cloned");
+            map2.Clear();
+            map2.Put("key2", "value3");
+            Set<Object> key2 = map2.KeySet();
+            Assert.IsTrue(key2 != keys, "KeySet() is identical");
+            Assert.AreEqual("key2", key2.Iterator().Next(), "KeySet() was not Cloned");
+
+            HashMap<Object, Object> hashmap = new HashMap<Object, Object>();
+            MockClonable mock = new MockClonable(1);
+            hashmap.Put(1, mock);
+            Assert.AreEqual(1, ((MockClonable) hashmap.Get(1)).i);
+            HashMap<Object, Object> hm3 = (HashMap<Object, Object>)hashmap.Clone();
+            Assert.AreEqual(1, ((MockClonable) hm3.Get(1)).i);
+            mock.i = 0;
+            Assert.AreEqual(0, ((MockClonable) hashmap.Get(1)).i);
+            Assert.AreEqual(0, ((MockClonable) hm3.Get(1)).i);
+         }
 
         [Test]
         public void TestContainsKey()
@@ -458,7 +456,6 @@ namespace Apache.NMS.Pooled.Commons.Collections
             }
             catch (NullReferenceException)
             {
-                // expected.
             }
 
             try
@@ -468,7 +465,6 @@ namespace Apache.NMS.Pooled.Commons.Collections
             }
             catch (NullReferenceException)
             {
-                // expected.
             }
         }
 

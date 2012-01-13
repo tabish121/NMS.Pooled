@@ -304,55 +304,63 @@ namespace Apache.NMS.Pooled.Commons.Collections
             }
         }
 
-//         public void test_Clone() {
-//             LinkedHashMap<Object, Object> hm2 = (LinkedHashMap<Object, Object>) hm.Clone();
-//             Assert.IsTrue("Clone answered equivalent LinkedHashMap", hm2 != hm);
-//             for (int counter = 0; counter < hmSize; counter++)
-//                 Assert.IsTrue("Clone answered unequal LinkedHashMap", hm
-//                         .Get(objArray2[counter]) == hm2.Get(objArray2[counter]));
-//        
-//             LinkedHashMap<Object, Object> map = new LinkedHashMap<Object, Object>();
-//             map.Put("key", "value");
-//             // get the KeySet() and Values() on the original Map
-//             Set keys = map.KeySet();
-//             Collection values = map.Values();
-//             Assert.AreEqual("Values() does not work", 
-//                     "value", values.Iterator().Next());
-//             Assert.AreEqual("KeySet() does not work", 
-//                     "key", keys.Iterator().Next());
-//             AbstractMap map2 = (AbstractMap) map.Clone();
-//             map2.Put("key", "value2");
-//             Collection values2 = map2.Values();
-//             Assert.IsTrue("Values() is identical", values2 != values);
-//        
-//             // Values() and KeySet() on the Cloned() map should be different
-//             Assert.AreEqual("Values() was not Cloned", 
-//                     "value2", values2.Iterator().Next());
-//             map2.Clear();
-//             map2.Put("key2", "value3");
-//             Set key2 = map2.KeySet();
-//             Assert.IsTrue("KeySet() is identical", key2 != keys);
-//             Assert.AreEqual("KeySet() was not Cloned", 
-//                     "key2", key2.Iterator().Next());
-//         }
-//            
-//            // regresion test for HARMONY-4603
-//            public void test_Clone_Mock() {
-//                LinkedHashMap<Object, Object> hashMap = new MockMap();
-//                String value = "value a";
-//                hashMap.Put("key", value);
-//                MockMap CloneMap = (MockMap) hashMap.Clone();
-//                Assert.AreEqual(value, CloneMap.Get("key"));
-//                Assert.AreEqual(hashMap, CloneMap);
-//                Assert.AreEqual(1, CloneMap.num);
-//
-//                hashMap.Put("key", "value b");
-//                assertFalse(hashMap.Equals(CloneMap));
-//            }
+        [Test]
+        public void TestClone()
+        {
+            LinkedHashMap<Object, Object> hm2 = (LinkedHashMap<Object, Object>) hm.Clone();
+            Assert.IsTrue(hm2 != hm, "Clone answered equivalent LinkedHashMap");
+
+            for (int counter = 0; counter < hmSize; counter++)
+            {
+                Assert.IsTrue(hm.Get(objArray2[counter]) == hm2.Get(objArray2[counter]),
+                              "Clone answered unequal LinkedHashMap");
+            }
+
+            LinkedHashMap<Object, Object> map = new LinkedHashMap<Object, Object>();
+            map.Put("key", "value");
+
+            // get the KeySet() and Values() on the original Map
+            Set<Object> keys = map.KeySet();
+            Collection<Object> values = map.Values();
+            Assert.AreEqual("value", values.Iterator().Next(), "Values() does not work");
+            Assert.AreEqual("key", keys.Iterator().Next(), "KeySet() does not work");
+            AbstractMap<Object, Object> map2 = (AbstractMap<Object, Object>) map.Clone();
+            map2.Put("key", "value2");
+            Collection<Object> values2 = map2.Values();
+            Assert.IsTrue(values2 != values, "Values() is identical");
+
+            // Values() and KeySet() on the Cloned() map should be different
+            Assert.AreEqual("value2", values2.Iterator().Next(), "Values() was not Cloned");
+            map2.Clear();
+            map2.Put("key2", "value3");
+            Set<Object> key2 = map2.KeySet();
+            Assert.IsTrue(key2 != keys, "KeySet() is identical");
+            Assert.AreEqual("key2", key2.Iterator().Next(), "KeySet() was not Cloned");
+        }
+
+        [Test]
+        public void TestCloneMock()
+        {
+            LinkedHashMap<Object, Object> hashMap = new MockMap();
+            String value = "value a";
+            hashMap.Put("key", value);
+            MockMap cloneMap = (MockMap) hashMap.Clone();
+            Assert.AreEqual(value, cloneMap.Get("key"));
+            Assert.AreEqual(hashMap, cloneMap);
+            Assert.AreEqual(1, cloneMap.Num);
+
+            hashMap.Put("key", "value b");
+            Assert.IsFalse(hashMap.Equals(cloneMap));
+        }
 
         class MockMap : LinkedHashMap<Object, Object>
         {
             private int num;
+
+            public int Num
+            {
+                get { return num; }
+            }
 
             public override Object Put(Object k, Object v)
             {

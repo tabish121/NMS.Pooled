@@ -19,7 +19,7 @@ using System;
 
 namespace Apache.NMS.Pooled.Commons.Collections
 {
-    public interface Map<K, V> where K : class where V : class
+    public interface Map<K, V> : ICloneable where K : class where V : class
     {
         void Clear();
 

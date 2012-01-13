@@ -745,6 +745,23 @@ namespace Apache.NMS.Pooled.Commons.Collections
             }
             return valuesCollection;
         }
+
+        public override Object Clone()
+        {
+            try
+            {
+                HashMap<K, V> map = (HashMap<K, V>) base.Clone();
+                map.elementCount = 0;
+                map.elementData = NewElementArray(elementData.Length);
+                map.PutAll(this);
+                return map;
+            }
+            catch (NotSupportedException)
+            {
+                return null;
+            }
+        }
+
     }
 }
 

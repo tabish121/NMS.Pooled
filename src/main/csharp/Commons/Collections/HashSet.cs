@@ -76,9 +76,8 @@ namespace Apache.NMS.Pooled.Commons.Collections
     
         public virtual Object Clone()
         {
-//            HashSet<E> clone = new HashSet<E>((HashMap<E, HashSet<E>>) backingMap.Clone());
-//            return clone;
-            return null;
+            HashSet<E> clone = new HashSet<E>((HashMap<E, HashSet<E>>) backingMap.Clone());
+            return clone;
         }
 
         public override bool Contains(E obj)

@@ -226,7 +226,7 @@ namespace Apache.NMS.Pooled.Commons.Collections
                 return map;
             }
 
-            public object Clone()
+            public override object Clone()
             {
                 try
                 {
