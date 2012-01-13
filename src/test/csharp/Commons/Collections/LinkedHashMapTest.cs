@@ -173,7 +173,6 @@ namespace Apache.NMS.Pooled.Commons.Collections
             }
             catch (NullReferenceException)
             {
-                // expected.
             }
 
             try
@@ -183,7 +182,6 @@ namespace Apache.NMS.Pooled.Commons.Collections
             }
             catch (NullReferenceException)
             {
-                // expected.
             }
         }
 
@@ -226,8 +224,8 @@ namespace Apache.NMS.Pooled.Commons.Collections
             int remove2 = (int) it.Next();
             it.Remove();
             ArrayList<Object> list = new ArrayList<Object>(Arrays.AsList(new Object[] { 1, 102, 203 }));
-            list.Remove(remove1);
-            list.Remove(remove2);
+            list.Remove((Object) remove1);
+            list.Remove((Object) remove2);
             Assert.IsTrue(it.Next().Equals(list.Get(0)), "Wrong result");
             Assert.AreEqual(1, map.Size(), "Wrong Size");
             Assert.IsTrue(map.KeySet().Iterator().Next().Equals(list.Get(0)), "Wrong contents");
@@ -401,170 +399,197 @@ namespace Apache.NMS.Pooled.Commons.Collections
             Assert.IsTrue(hm.Size() == (objArray.Length + 2), "Returned incorrect Size");
         }
 
-//         public void test_ordered_EntrySet() {
-//             int i;
-//             int sz = 100;
-//             LinkedHashMap lhm = new LinkedHashMap();
-//             for (i = 0; i < sz; i++) {
-//                 Integer ii = new Integer(i);
-//                 lhm.Put(ii, ii.ToString());
-//             }
-//        
-//             Set s1 = lhm.EntrySet();
-//             Iterator it1 = s1.Iterator();
-//             Assert.IsTrue("Returned set of incorrect Size 1", lhm.Size() == s1.Size());
-//             for (i = 0; it1.HasNext; i++) {
-//                 Entry<Object, Object> m = (Entry<Object, Object>) it1.Next();
-//                 Integer jj = (Integer) m.Key;
-//                 Assert.IsTrue("Returned incorrect entry set 1", jj.intValue() == i);
-//             }
-//        
-//             LinkedHashMap lruhm = new LinkedHashMap(200, .75f, true);
-//             for (i = 0; i < sz; i++) {
-//                 Integer ii = new Integer(i);
-//                 lruhm.Put(ii, ii.ToString());
-//             }
-//        
-//             Set s3 = lruhm.EntrySet();
-//             Iterator it3 = s3.Iterator();
-//             Assert.IsTrue("Returned set of incorrect Size 2", lruhm.Size() == s3
-//                     .Size());
-//             for (i = 0; i < sz && it3.HasNext; i++) {
-//                 Entry<Object, Object> m = (Entry<Object, Object>) it3.Next();
-//                 Integer jj = (Integer) m.Key;
-//                 Assert.IsTrue("Returned incorrect entry set 2", jj.intValue() == i);
-//             }
-//        
-//             /* fetch the even numbered entries to affect traversal order */
-//             int p = 0;
-//             for (i = 0; i < sz; i += 2) {
-//                 String ii = (String) lruhm.Get(new Integer(i));
-//                 p = p + Integer.parseInt(ii);
-//             }
-//             Assert.AreEqual("invalid sum of even numbers", 2450, p);
-//        
-//             Set s2 = lruhm.EntrySet();
-//             Iterator it2 = s2.Iterator();
-//             Assert.IsTrue("Returned set of incorrect Size 3", lruhm.Size() == s2
-//                     .Size());
-//             for (i = 1; i < sz && it2.HasNext; i += 2) {
-//                 Entry<Object, Object> m = (Entry<Object, Object>) it2.Next();
-//                 Integer jj = (Integer) m.Key;
-//                 Assert.IsTrue("Returned incorrect entry set 3", jj.intValue() == i);
-//             }
-//             for (i = 0; i < sz && it2.HasNext; i += 2) {
-//                 Entry<Object, Object> m = (Entry<Object, Object>) it2.Next();
-//                 Integer jj = (Integer) m.Key;
-//                 Assert.IsTrue("Returned incorrect entry set 4", jj.intValue() == i);
-//             }
-//             Assert.IsTrue("Entries left to iterate on", !it2.HasNext);
-//         }
-//
-//         public void test_ordered_KeySet() {
-//             int i;
-//             int sz = 100;
-//             LinkedHashMap lhm = new LinkedHashMap();
-//             for (i = 0; i < sz; i++) {
-//                 Integer ii = new Integer(i);
-//                 lhm.Put(ii, ii.ToString());
-//             }
-//        
-//             Set s1 = lhm.KeySet();
-//             Iterator it1 = s1.Iterator();
-//             Assert.IsTrue("Returned set of incorrect Size", lhm.Size() == s1.Size());
-//             for (i = 0; it1.HasNext; i++) {
-//                 Integer jj = (Integer) it1.Next();
-//                 Assert.IsTrue("Returned incorrect entry set", jj.intValue() == i);
-//             }
-//        
-//             LinkedHashMap lruhm = new LinkedHashMap(200, .75f, true);
-//             for (i = 0; i < sz; i++) {
-//                 Integer ii = new Integer(i);
-//                 lruhm.Put(ii, ii.ToString());
-//             }
-//        
-//             Set s3 = lruhm.KeySet();
-//             Iterator it3 = s3.Iterator();
-//             Assert.IsTrue("Returned set of incorrect Size", lruhm.Size() == s3.Size());
-//             for (i = 0; i < sz && it3.HasNext; i++) {
-//                 Integer jj = (Integer) it3.Next();
-//                 Assert.IsTrue("Returned incorrect entry set", jj.intValue() == i);
-//             }
-//        
-//             /* fetch the even numbered entries to affect traversal order */
-//             int p = 0;
-//             for (i = 0; i < sz; i += 2) {
-//                 String ii = (String) lruhm.Get(new Integer(i));
-//                 p = p + Integer.parseInt(ii);
-//             }
-//             Assert.AreEqual("invalid sum of even numbers", 2450, p);
-//        
-//             Set s2 = lruhm.KeySet();
-//             Iterator it2 = s2.Iterator();
-//             Assert.IsTrue("Returned set of incorrect Size", lruhm.Size() == s2.Size());
-//             for (i = 1; i < sz && it2.HasNext; i += 2) {
-//                 Integer jj = (Integer) it2.Next();
-//                 Assert.IsTrue("Returned incorrect entry set", jj.intValue() == i);
-//             }
-//             for (i = 0; i < sz && it2.HasNext; i += 2) {
-//                 Integer jj = (Integer) it2.Next();
-//                 Assert.IsTrue("Returned incorrect entry set", jj.intValue() == i);
-//             }
-//             Assert.IsTrue("Entries left to iterate on", !it2.HasNext);
-//         }
-//
-//         public void test_ordered_Values() {
-//             int i;
-//             int sz = 100;
-//             LinkedHashMap lhm = new LinkedHashMap();
-//             for (i = 0; i < sz; i++) {
-//                 Integer ii = new Integer(i);
-//                 lhm.Put(ii, new Integer(i * 2));
-//             }
-//        
-//             Collection s1 = lhm.Values();
-//             Iterator it1 = s1.Iterator();
-//             Assert.IsTrue("Returned set of incorrect Size 1", lhm.Size() == s1.Size());
-//             for (i = 0; it1.HasNext; i++) {
-//                 Integer jj = (Integer) it1.Next();
-//                 Assert.IsTrue("Returned incorrect entry set 1", jj.intValue() == i * 2);
-//             }
-//        
-//             LinkedHashMap lruhm = new LinkedHashMap(200, .75f, true);
-//             for (i = 0; i < sz; i++) {
-//                 Integer ii = new Integer(i);
-//                 lruhm.Put(ii, new Integer(i * 2));
-//             }
-//        
-//             Collection s3 = lruhm.Values();
-//             Iterator it3 = s3.Iterator();
-//             Assert.IsTrue("Returned set of incorrect Size", lruhm.Size() == s3.Size());
-//             for (i = 0; i < sz && it3.HasNext; i++) {
-//                 Integer jj = (Integer) it3.Next();
-//                 Assert.IsTrue("Returned incorrect entry set", jj.intValue() == i * 2);
-//             }
-//        
-//             // fetch the even numbered entries to affect traversal order
-//             int p = 0;
-//             for (i = 0; i < sz; i += 2) {
-//                 Integer ii = (Integer) lruhm.Get(new Integer(i));
-//                 p = p + ii.intValue();
-//             }
-//             Assert.IsTrue("invalid sum of even numbers", p == 2450 * 2);
-//        
-//             Collection s2 = lruhm.Values();
-//             Iterator it2 = s2.Iterator();
-//             Assert.IsTrue("Returned set of incorrect Size", lruhm.Size() == s2.Size());
-//             for (i = 1; i < sz && it2.HasNext; i += 2) {
-//                 Integer jj = (Integer) it2.Next();
-//                 Assert.IsTrue("Returned incorrect entry set", jj.intValue() == i * 2);
-//             }
-//             for (i = 0; i < sz && it2.HasNext; i += 2) {
-//                 Integer jj = (Integer) it2.Next();
-//                 Assert.IsTrue("Returned incorrect entry set", jj.intValue() == i * 2);
-//             }
-//             Assert.IsTrue("Entries left to iterate on", !it2.HasNext);
-//         }
+        [Test]
+        public void TestOrderedEntrySet()
+        {
+            int i;
+            int sz = 100;
+            LinkedHashMap<Object, Object> lhm = new LinkedHashMap<Object, Object>();
+            for (i = 0; i < sz; i++)
+            {
+                lhm.Put(i, i.ToString());
+            }
+
+            Set<Entry<Object, Object>> s1 = lhm.EntrySet();
+            Iterator<Entry<Object, Object>> it1 = s1.Iterator();
+            Assert.IsTrue(lhm.Size() == s1.Size(), "Returned set of incorrect Size 1");
+            for (i = 0; it1.HasNext; i++)
+            {
+                Entry<Object, Object> m = it1.Next();
+                int jj = (int) m.Key;
+                Assert.IsTrue(jj == i, "Returned incorrect entry set 1");
+            }
+
+            LinkedHashMap<Object, Object> lruhm = new LinkedHashMap<Object, Object>(200, .75f, true);
+            for (i = 0; i < sz; i++)
+            {
+                lruhm.Put(i, i.ToString());
+            }
+
+            Set<Entry<Object, Object>> s3 = lruhm.EntrySet();
+            Iterator<Entry<Object, Object>> it3 = s3.Iterator();
+            Assert.IsTrue(lruhm.Size() == s3.Size(), "Returned set of incorrect Size 2");
+            for (i = 0; i < sz && it3.HasNext; i++)
+            {
+                Entry<Object, Object> m = it3.Next();
+                int jj = (int) m.Key;
+                Assert.IsTrue(jj == i, "Returned incorrect entry set 2");
+            }
+
+            /* fetch the even numbered entries to affect traversal order */
+            int p = 0;
+            for (i = 0; i < sz; i += 2)
+            {
+                String ii = (String) lruhm.Get(i);
+                p = p + Int32.Parse(ii);
+            }
+            Assert.AreEqual(2450, p, "invalid sum of even numbers");
+
+            Set<Entry<Object, Object>> s2 = lruhm.EntrySet();
+            Iterator<Entry<Object, Object>> it2 = s2.Iterator();
+            Assert.IsTrue(lruhm.Size() == s2.Size(), "Returned set of incorrect Size 3");
+            for (i = 1; i < sz && it2.HasNext; i += 2)
+            {
+                Entry<Object, Object> m = (Entry<Object, Object>) it2.Next();
+                int jj = (int) m.Key;
+                Assert.IsTrue(jj == i, "Returned incorrect entry set 3");
+            }
+
+            for (i = 0; i < sz && it2.HasNext; i += 2)
+            {
+                Entry<Object, Object> m = (Entry<Object, Object>) it2.Next();
+                int jj = (int) m.Key;
+                Assert.IsTrue(jj == i, "Returned incorrect entry set 4");
+            }
+
+            Assert.IsTrue(!it2.HasNext, "Entries left to iterate on");
+        }
+
+        [Test]
+        public void TestOrderedKeySet()
+        {
+            int i;
+            int sz = 100;
+            LinkedHashMap<Object, Object> lhm = new LinkedHashMap<Object, Object>();
+            for (i = 0; i < sz; i++)
+            {
+                lhm.Put(i, i.ToString());
+            }
+
+            Set<Object> s1 = lhm.KeySet();
+            Iterator<Object> it1 = s1.Iterator();
+            Assert.IsTrue(lhm.Size() == s1.Size(), "Returned set of incorrect Size");
+            for (i = 0; it1.HasNext; i++)
+            {
+                int jj = (int) it1.Next();
+                Assert.IsTrue(jj == i, "Returned incorrect entry set");
+            }
+
+            LinkedHashMap<Object, Object> lruhm = new LinkedHashMap<Object, Object>(200, .75f, true);
+            for (i = 0; i < sz; i++)
+            {
+                lruhm.Put(i, i.ToString());
+            }
+
+            Set<Object> s3 = lruhm.KeySet();
+            Iterator<Object> it3 = s3.Iterator();
+            Assert.IsTrue(lruhm.Size() == s3.Size(), "Returned set of incorrect Size");
+            for (i = 0; i < sz && it3.HasNext; i++)
+            {
+                int jj = (int) it3.Next();
+                Assert.IsTrue(jj == i, "Returned incorrect entry set");
+            }
+
+            /* fetch the even numbered entries to affect traversal order */
+            int p = 0;
+            for (i = 0; i < sz; i += 2)
+            {
+                String ii = (String) lruhm.Get(i);
+                p = p + Int32.Parse(ii);
+            }
+
+            Assert.AreEqual(2450, p, "invalid sum of even numbers");
+
+            Set<Object> s2 = lruhm.KeySet();
+            Iterator<Object> it2 = s2.Iterator();
+            Assert.IsTrue(lruhm.Size() == s2.Size(), "Returned set of incorrect Size");
+            for (i = 1; i < sz && it2.HasNext; i += 2)
+            {
+                int jj = (int) it2.Next();
+                Assert.IsTrue(jj == i, "Returned incorrect entry set");
+            }
+
+            for (i = 0; i < sz && it2.HasNext; i += 2)
+            {
+                int jj = (int) it2.Next();
+                Assert.IsTrue(jj == i, "Returned incorrect entry set");
+            }
+
+            Assert.IsTrue(!it2.HasNext, "Entries left to iterate on");
+        }
+
+        [Test]
+        public void TestOrderedValues()
+        {
+            int i;
+            int sz = 100;
+            LinkedHashMap<Object, Object> lhm = new LinkedHashMap<Object, Object>();
+            for (i = 0; i < sz; i++)
+            {
+                lhm.Put(i, (i * 2));
+            }
+
+            Collection<Object> s1 = lhm.Values();
+            Iterator<Object> it1 = s1.Iterator();
+            Assert.IsTrue(lhm.Size() == s1.Size(), "Returned set of incorrect Size 1");
+            for (i = 0; it1.HasNext; i++)
+            {
+                int jj = (int) it1.Next();
+                Assert.IsTrue(jj == i * 2, "Returned incorrect entry set 1");
+            }
+
+            LinkedHashMap<Object, Object> lruhm = new LinkedHashMap<Object, Object>(200, .75f, true);
+            for (i = 0; i < sz; i++)
+            {
+                lruhm.Put(i, (i * 2));
+            }
+
+            Collection<Object> s3 = lruhm.Values();
+            Iterator<Object> it3 = s3.Iterator();
+            Assert.IsTrue(lruhm.Size() == s3.Size(), "Returned set of incorrect Size");
+            for (i = 0; i < sz && it3.HasNext; i++)
+            {
+                int jj = (int) it3.Next();
+                Assert.IsTrue(jj == i * 2, "Returned incorrect entry set");
+            }
+
+            // fetch the even numbered entries to affect traversal order
+            int p = 0;
+            for (i = 0; i < sz; i += 2)
+            {
+                int ii = (int) lruhm.Get(i);
+                p = p + ii;
+            }
+
+            Assert.IsTrue(p == 2450 * 2, "invalid sum of even numbers");
+
+            Collection<Object> s2 = lruhm.Values();
+            Iterator<Object> it2 = s2.Iterator();
+            Assert.IsTrue(lruhm.Size() == s2.Size(), "Returned set of incorrect Size");
+            for (i = 1; i < sz && it2.HasNext; i += 2)
+            {
+                int jj = (int) it2.Next();
+                Assert.IsTrue(jj == i * 2, "Returned incorrect entry set");
+            }
+
+            for (i = 0; i < sz && it2.HasNext; i += 2)
+            {
+                int jj = (int) it2.Next();
+                Assert.IsTrue(jj == i * 2, "Returned incorrect entry set");
+            }
+
+            Assert.IsTrue(!it2.HasNext, "Entries left to iterate on");
+        }
 
         [Test]
         public void TestRemoveEldest()
