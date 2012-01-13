@@ -76,5 +76,6 @@
     <Compile Include="src\test\csharp\Commons\Pool\Impl\TestGenericObjectPool.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\AbstractMapTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\HashMapTest.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\LinkedHashMapTest.cs" />
   </ItemGroup>
 </Project>
