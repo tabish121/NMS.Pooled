@@ -103,6 +103,8 @@
     <Compile Include="src\main\csharp\Commons\Collections\Concurrent\locks\Condition.cs" />
     <Compile Include="src\main\csharp\Commons\Collections\Concurrent\locks\LockSupport.cs" />
     <Compile Include="src\main\csharp\Commons\Collections\Concurrent\locks\Lock.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Concurrent\CopyOnWriteArrayList.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Concurrent\CopyOnWriteArraySet.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\main\csharp\Util\" />

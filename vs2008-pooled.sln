@@ -21,7 +21,7 @@ Global
 		{8B0AFB62-448D-423F-BD6B-547B8F537297}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = vs2008-pooled-test.csproj
+		StartupItem = vs2008-pooled.csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = None
