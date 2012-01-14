@@ -77,5 +77,7 @@
     <Compile Include="src\test\csharp\Commons\Collections\AbstractMapTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\HashMapTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\LinkedHashMapTest.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\HashSetTest.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\LinkedHashSetTest.cs" />
   </ItemGroup>
 </Project>

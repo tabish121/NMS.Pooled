@@ -21,7 +21,7 @@ namespace Apache.NMS.Pooled.Commons.Collections
 {
     public class HashSet<E> : AbstractSet<E>, Set<E>, ICloneable where E : class
     {
-        private readonly HashMap<E, HashSet<E>> backingMap;
+        private HashMap<E, HashSet<E>> backingMap;
 
         /// <summary>
         /// Create a new empty HashSet instance.
@@ -76,8 +76,16 @@ namespace Apache.NMS.Pooled.Commons.Collections
     
         public virtual Object Clone()
         {
-            HashSet<E> clone = new HashSet<E>((HashMap<E, HashSet<E>>) backingMap.Clone());
-            return clone;
+            try
+            {
+                HashSet<E> clone = (HashSet<E>) base.MemberwiseClone();
+                clone.backingMap = (HashMap<E, HashSet<E>>) backingMap.Clone();
+                return clone;
+            }
+            catch (NotSupportedException)
+            {
+                return null;
+            }
         }
 
         public override bool Contains(E obj)
