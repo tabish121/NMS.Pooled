@@ -79,5 +79,7 @@
     <Compile Include="src\test\csharp\Commons\Collections\LinkedHashMapTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\HashSetTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\LinkedHashSetTest.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\Concurrent\CopyOnWriteArrayListTest.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\Concurrent\CopyOnWriteArraySetTest.cs" />
   </ItemGroup>
 </Project>

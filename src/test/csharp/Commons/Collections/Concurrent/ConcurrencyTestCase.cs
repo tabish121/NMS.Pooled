@@ -38,6 +38,14 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
         protected static readonly String eight = (8).ToString();
         protected static readonly String nine = (9).ToString();
 
+        protected static readonly Object m1 = -1;
+        protected static readonly Object m2 = -2;
+        protected static readonly Object m3 = -3;
+        protected static readonly Object m4 = -4;
+        protected static readonly Object m5 = -5;
+        protected static readonly Object m6 = -6;
+        protected static readonly Object m10 = -10;
+
         /// <summary>
         /// Fails with message Shoulds the throw exception.
         /// </summary>
