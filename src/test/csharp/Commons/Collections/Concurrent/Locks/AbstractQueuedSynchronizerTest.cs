@@ -90,7 +90,8 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 sync.AcquireInterruptibly(1);
             }
             catch(ThreadInterruptedException)
-            {}
+            {
+            }
         }
 
         private void InterruptedSyncRunnable(Object state)
@@ -102,7 +103,8 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 ThreadShouldThrow();
             }
             catch(ThreadInterruptedException)
-            {}
+            {
+            }
         }
 
         [SetUp]
@@ -550,9 +552,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             catch (ThreadStateException)
             {
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                UnexpectedException();
+                UnexpectedException(e);
             }
         }
 
@@ -569,9 +571,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             catch (ThreadStateException)
             {
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                UnexpectedException();
+                UnexpectedException(e);
             }
         }
 
@@ -586,9 +588,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 Assert.IsFalse(c.Await(SHORT_DELAY_MS) == 0);
                 sync.Release(1);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                UnexpectedException();
+                UnexpectedException(e);
             }
         }
 
@@ -658,9 +660,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             catch (NullReferenceException)
             {
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                UnexpectedException();
+                UnexpectedException(e);
             }
         }
 
@@ -676,9 +678,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             catch (NullReferenceException)
             {
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                UnexpectedException();
+                UnexpectedException(e);
             }
         }
 
@@ -694,9 +696,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             catch (NullReferenceException)
             {
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                UnexpectedException();
+                UnexpectedException(e);
             }
         }
 
@@ -715,9 +717,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             catch (ArgumentException)
             {
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                UnexpectedException();
+                UnexpectedException(e);
             }
         }
 
@@ -735,9 +737,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             catch (ThreadStateException)
             {
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                UnexpectedException();
+                UnexpectedException(e);
             }
         }
 
@@ -756,9 +758,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             catch (ArgumentException)
             {
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                UnexpectedException();
+                UnexpectedException(e);
             }
         }
 
@@ -775,9 +777,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             catch (ThreadStateException)
             {
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                UnexpectedException();
+                UnexpectedException(e);
             }
         }
 
@@ -796,9 +798,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             catch (ArgumentException)
             {
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                UnexpectedException();
+                UnexpectedException(e);
             }
         }
 
@@ -816,9 +818,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             catch (ThreadStateException)
             {
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                UnexpectedException();
+                UnexpectedException(e);
             }
         }
 
@@ -904,7 +906,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 //                        }
 //         }
 //         });
-//    
+//
 //            try {
 //                t1.Start();
 //                Thread.Sleep(SHORT_DELAY_MS);

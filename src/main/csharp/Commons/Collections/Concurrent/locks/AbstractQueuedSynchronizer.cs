@@ -1660,7 +1660,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         {
             if (!Owns(condition))
             {
-                throw new ThreadStateException("Not owner");
+                throw new ArgumentException("Not owner");
             }
 
             return condition.HasWaiters;
@@ -1686,7 +1686,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         {
             if (!Owns(condition))
             {
-                throw new ThreadStateException("Not owner");
+                throw new ArgumentException("Not owner");
             }
 
             return condition.WaitQueueLength;
