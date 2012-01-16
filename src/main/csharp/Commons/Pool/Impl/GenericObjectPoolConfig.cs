@@ -25,11 +25,6 @@ namespace Apache.NMS.Pooled.Commons.Pool.Impl
     public class GenericObjectPoolConfig : BaseObjectPoolConfig
     {
         /**
-         * The default value for SoftMinEvictableIdleTimeMillis.
-         */
-        public static readonly long DEFAULT_SOFT_MIN_EVICTABLE_IDLE_TIME_MILLIS = -1;
-
-        /**
          * The default maximum number of instances under management
          * (idle or checked out).
          */
@@ -50,12 +45,6 @@ namespace Apache.NMS.Pooled.Commons.Pool.Impl
         private int maxTotal = DEFAULT_MAX_TOTAL;
         private int maxIdle = DEFAULT_MAX_IDLE;
         private int minIdle = DEFAULT_MIN_IDLE;
-    
-        public long SoftMinEvictableIdleTimeMillis
-        {
-            get { return softMinEvictableIdleTimeMillis; }
-            set { this.softMinEvictableIdleTimeMillis = value; }
-        }
 
         public int MaxTotal
         {

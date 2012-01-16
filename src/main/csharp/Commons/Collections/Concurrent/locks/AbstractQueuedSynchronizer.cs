@@ -139,21 +139,19 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
              */
             public Node nextWaiter;
     
-            /**
-             * Returns true if node is waiting in shared mode
-             */
+            /// <summary>
+            /// Returns true if node is waiting in shared mode
+            /// </summary>
             public bool IsShared()
             {
                 return nextWaiter == SHARED;
             }
     
-            /**
-             * Returns previous node, or throws NullPointerException if null.
-             * Use when predecessor cannot be null.  The null check could
-             * be elided, but is present to help the VM.
-             *
-             * @return the predecessor of this node
-             */
+            /// <summary>
+            /// Returns previous node, or throws NullReferenceException if null.  Use
+            /// when predecessor cannot be null.  The null check could be elided, but
+            /// is present to help the VM.
+            /// </summary>
             public Node Predecessor()
             {
                 Node p = prev;
@@ -376,14 +374,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             }
         }
 
-        /**
-         * Sets head of queue, and checks if successor may be waiting
-         * in shared mode, if so propagating if either propagate > 0 or
-         * PROPAGATE status was set.
-         *
-         * @param node the node
-         * @param propagate the return value from a tryAcquireShared
-         */
+        /// <summary>
+        /// Sets head of queue, and checks if successor may be waiting in shared mode,
+        /// if so propagating if either propagate > 0 or PROPAGATE status was set.
+        /// </summary>
         private void SetHeadAndPropagate(Node node, int propagate)
         {
             Node h = head; // Record old head for check below
@@ -522,7 +516,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         private bool ParkAndCheckInterrupt()
         {
             LockSupport.Park();
-            return false;
+            return LockSupport.Interrupted();
         }
 
         /// <summary>
@@ -650,6 +644,11 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                     else
                     {
                         timeout = deadline - awakeTime;
+                    }
+
+                    if (LockSupport.Interrupted())
+                    {
+                        throw new ThreadInterruptedException();
                     }
                 }
             }
@@ -805,6 +804,11 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                     {
                         timeout = deadline - awakeTime;
                     }
+
+                    if (LockSupport.Interrupted())
+                    {
+                        throw new ThreadInterruptedException();
+                    }
                 }
             }
             finally
@@ -939,21 +943,14 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             throw new NotSupportedException();
         }
     
-        /**
-         * Returns {@code true} if synchronization is held exclusively with
-         * respect to the current (calling) thread.  This method is invoked
-         * upon each call to a non-waiting {@link ConditionObject} method.
-         * (Waiting methods instead invoke {@link #release}.)
-         *
-         * <p>The default implementation throws {@link
-         * UnsupportedOperationException}. This method is invoked
-         * internally only within {@link ConditionObject} methods, so need
-         * not be defined if conditions are not used.
-         *
-         * @return {@code true} if synchronization is held exclusively;
-         *         {@code false} otherwise
-         * @throws UnsupportedOperationException if conditions are not supported
-         */
+        /// <summary>
+        /// Returns true if synchronization is held exclusively with respect to the
+        /// current (calling) thread.  This method is invoked upon each call to a
+        /// non-waiting ConditionObject method.  (Waiting methods instead invoke Release.)
+        /// The default implementation throws NotSupportedException.  This method is
+        /// invoked internally only within ConditionObject methods, so need not be
+        /// defined if conditions are not used.
+        /// </summary>
         protected virtual bool IsHeldExclusively()
         {
             throw new NotSupportedException();
@@ -995,6 +992,11 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
          */
         public void AcquireInterruptibly(int arg)
         {
+            if (LockSupport.Interrupted())
+            {
+                throw new ThreadInterruptedException();
+            }
+
             if (!TryAcquire(arg))
             {
                 DoAcquireInterruptibly(arg);
@@ -1020,11 +1022,21 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
          */
         public bool TryAcquire(int arg, long timeout)
         {
+            if (LockSupport.Interrupted())
+            {
+                throw new ThreadInterruptedException();
+            }
+
             return TryAcquire(arg) || DoAcquireTimed(arg, TimeSpan.FromMilliseconds(timeout));
         }
 
         public bool TryAcquire(int arg, TimeSpan timeout)
         {
+            if (LockSupport.Interrupted())
+            {
+                throw new ThreadInterruptedException();
+            }
+
             return TryAcquire(arg) || DoAcquireTimed(arg, timeout);
         }
 
@@ -1086,6 +1098,11 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
          */
         public void AcquireSharedInterruptibly(int arg)
         {
+            if (LockSupport.Interrupted())
+            {
+                throw new ThreadInterruptedException();
+            }
+
             if (TryAcquireShared(arg) < 0)
             {
                 DoAcquireSharedInterruptibly(arg);
@@ -1110,11 +1127,21 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
          */
         public bool TryAcquireShared(int arg, long timeout)
         {
+            if (LockSupport.Interrupted())
+            {
+                throw new ThreadInterruptedException();
+            }
+
             return TryAcquireShared(arg) >= 0 || DoAcquireSharedTimed(arg, TimeSpan.FromMilliseconds(timeout));
         }
 
         public bool TryAcquireShared(int arg, TimeSpan timeout)
         {
+            if (LockSupport.Interrupted())
+            {
+                throw new ThreadInterruptedException();
+            }
+
             return TryAcquireShared(arg) >= 0 || DoAcquireSharedTimed(arg, timeout);
         }
 
@@ -1460,12 +1487,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 
         #region Condition Support Methods and Classes
 
-        /**
-         * Returns true if a node, always one that was initially placed on
-         * a condition queue, is now waiting to reacquire on sync queue.
-         * @param node the node
-         * @return true if is reacquiring
-         */
+        /// <summary>
+        /// Returns true if a node, always one that was initially placed on a condition
+        /// queue, is now waiting to reacquire on sync queue.
+        /// </summary>
         private bool IsOnSyncQueue(Node node)
         {
             if (node.waitStatus == Node.CONDITION || node.prev == null)
@@ -1489,11 +1514,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             return FindNodeFromTail(node);
         }
     
-        /**
-         * Returns true if node is on sync queue by searching backwards from tail.
-         * Called only when needed by isOnSyncQueue.
-         * @return true if present
-         */
+        /// <summary>
+        /// Returns true if node is on sync queue by searching backwards from tail.
+        /// Called only when needed by IsOnSyncQueue.
+        /// </summary>
         private bool FindNodeFromTail(Node node)
         {
             Node t = tail;
@@ -1513,13 +1537,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             }
         }
     
-        /**
-         * Transfers a node from a condition queue onto sync queue.
-         * Returns true if successful.
-         * @param node the node
-         * @return true if successfully transferred (else the node was
-         * cancelled before signal).
-         */
+        /// <summary>
+        /// Transfers a node from a condition queue onto sync queue.
+        /// Returns true if successful.
+        /// </summary>
         private bool TransferForSignal(Node node)
         {
             /*
@@ -1545,14 +1566,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             return true;
         }
     
-        /**
-         * Transfers node, if necessary, to sync queue after a cancelled
-         * wait. Returns true if thread was cancelled before being
-         * signalled.
-         * @param current the waiting thread
-         * @param node its node
-         * @return true if cancelled before the node was signalled
-         */
+        /// <summary>
+        /// Transfers node, if necessary, to sync queue after a cancelled wait.
+        /// Returns true if thread was cancelled before being signalled.
+        /// </summary>
         private bool TransferAfterCancelledWait(Node node)
         {
             if (CompareAndSetWaitStatus(node, Node.CONDITION, 0))
@@ -1675,22 +1692,22 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             return condition.WaitQueueLength;
         }
     
-        /**
-         * Returns a collection containing those threads that may be
-         * waiting on the given condition associated with this
-         * synchronizer.  Because the actual set of threads may change
-         * dynamically while constructing this result, the returned
-         * collection is only a best-effort estimate. The elements of the
-         * returned collection are in no particular order.
-         *
-         * @param condition the condition
-         * @return the collection of threads
-         * @throws ThreadStateException if exclusive synchronization
-         *         is not held
-         * @throws IllegalArgumentException if the given condition is
-         *         not associated with this synchronizer
-         * @throws NullPointerException if the condition is null
-         */
+        /// <summary>
+        /// Returns a collection containing those threads that may be waiting on the
+        /// given condition associated with this synchronizer.  Because the actual
+        /// set of threads may change dynamically while constructing this result,
+        /// the returned collection is only a best-effort estimate.  The elements
+        /// of the returned collection are in no particular order.
+        /// </summary>
+        /// <exception cref='ArgumentException'>
+        /// Is thrown when the given condition is not associated with this synchronizer.
+        /// </exception>
+        /// <exception cref='ThreadStateException'>
+        /// Is thrown when exclusive synchronization is not held.
+        /// </exception>
+        /// <exception cref='NullReferenceException'>
+        /// Is thrown when the Condition object passed is null.
+        /// </exception>
         public Collection<Thread> GetWaitingThreads(ConditionObject condition)
         {
             if (!Owns(condition))
@@ -1700,21 +1717,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             return condition.WaitingThreads;
         }
 
-        /**
-         * Condition implementation for a {@link
-         * AbstractQueuedSynchronizer} serving as the basis of a {@link
-         * Lock} implementation.
-         *
-         * <p>Method documentation for this class describes mechanics,
-         * not behavioral specifications from the point of view of Lock
-         * and Condition users. Exported versions of this class will in
-         * general need to be accompanied by documentation describing
-         * condition semantics that rely on those of the associated
-         * <tt>AbstractQueuedSynchronizer</tt>.
-         *
-         * <p>This class is Serializable, but all fields are transient,
-         * so deserialized conditions have no waiters.
-         */
+        /// <summary>
+        /// Condition implementation for a AbstractQueuedSynchronizer serving as
+        /// the basis of a Lock implementation.
+        /// </summary>
         public class ConditionObject : Condition
         {
             // First node of condition queue.
@@ -1790,20 +1796,17 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 while (first != null);
             }
     
-            /**
-             * Unlinks cancelled waiter nodes from condition queue.
-             * Called only while holding lock. This is called when
-             * cancellation occurred during condition wait, and upon
-             * insertion of a new waiter when lastWaiter is seen to have
-             * been cancelled. This method is needed to avoid garbage
-             * retention in the absence of signals. So even though it may
-             * require a full traversal, it comes into play only when
-             * timeouts or cancellations occur in the absence of
-             * signals. It traverses all nodes rather than stopping at a
-             * particular target to unlink all pointers to garbage nodes
-             * without requiring many re-traversals during cancellation
-             * storms.
-             */
+            /// <summary>
+            /// Unlinks cancelled waiter nodes from condition queue.  Called only while
+            /// holding lock. This is called when cancellation occurred during condition
+            /// wait, and upon insertion of a new waiter when lastWaiter is seen to have
+            /// been cancelled. This method is needed to avoid garbage retention in the
+            /// absence of signals.  So even though it may require a full traversal, it
+            /// comes into play only when timeouts or cancellations occur in the absence
+            /// of signals. It traverses all nodes rather than stopping at a particular
+            /// target to unlink all pointers to garbage nodes without requiring many
+            /// re-traversals during cancellation storms.
+            /// </summary>
             private void UnlinkCancelledWaiters()
             {
                 Node t = firstWaiter;
@@ -1854,13 +1857,11 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 }
             }
     
-            /**
-             * Moves all threads from the wait queue for this condition to
-             * the wait queue for the owning lock.
-             *
-             * @throws ThreadStateException if {@link #IsHeldExclusively}
-             *         returns {@code false}
-             */
+            /// <summary>
+            /// Moves all threads from the wait queue for this condition to the wait
+            /// queue for the owning lock.  Throws ThreadStateException if IsHeldExclusively
+            /// returns false.
+            /// </summary>
             public void SignalAll()
             {
                 if (!parent.IsHeldExclusively())
@@ -1894,11 +1895,8 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 
                 while (!parent.IsOnSyncQueue(node))
                 {
-                    try
-                    {
-                        LockSupport.Park();
-                    }
-                    catch(ThreadInterruptedException)
+                    LockSupport.Park();
+                    if (LockSupport.Interrupted())
                     {
                         interrupted = true;
                     }
@@ -1928,13 +1926,14 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             /// </summary>
             private int CheckInterruptWhileWaiting(Node node)
             {
-                return parent.TransferAfterCancelledWait(node) ? THROW_IE : 0;
+                return LockSupport.Interrupted() ?
+                    parent.TransferAfterCancelledWait(node) ? THROW_IE : REINTERRUPT : 0;
             }
     
-            /**
-             * Throws ThreadInterruptedException, reinterrupts current thread, or
-             * does nothing, depending on mode.
-             */
+            /// <summary>
+            /// Throws ThreadInterruptedException, reinterrupts current thread, or
+            /// does nothing, depending on mode.
+            /// </summary>
             private void ReportInterruptAfterWait(int interruptMode)
             {
                 if (interruptMode == THROW_IE)
@@ -1947,25 +1946,28 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 }
             }
     
-            /**
-             * Implements interruptible condition wait.
-             * <ol>
-             * <li> If current thread is interrupted, throw ThreadInterruptedException.
-             * <li> Save lock state returned by {@link #getState}.
-             * <li> Invoke {@link #release} with
-             *      saved state as argument, throwing
-             *      ThreadStateException if it fails.
-             * <li> Block until signalled or interrupted.
-             * <li> Reacquire by invoking specialized version of
-             *      {@link #acquire} with saved state as argument.
-             * <li> If interrupted while blocked in step 4, throw ThreadInterruptedException.
-             * </ol>
-             *
-             * @throws ThreadInterruptedException if the current thread is interrupted (and
-             * interruption of thread suspension is supported).
-             */
+            /// <summary>
+            /// Implements interruptible condition wait.
+            /// <list type="bullet">
+            /// <item>If current thread is interrupted, throw ThreadInterruptedException.</item>
+            /// <item>Save lock state returned by State</item>
+            /// <item>Invoke Release with saved state as argument, throwing
+            /// ThreadStateException if it fails.
+            /// </item>
+            /// <item>Block until signalled or interrupted.</item>
+            /// <item>Reacquire by invoking specialized version of Acquire with saved State</item>
+            /// <item>If interrupted while blocked in step 4, throw ThreadInterruptedException.</item>
+            /// </list>
+            /// Throws ThreadInterruptedException if the current thread is interrupted (and
+            /// interruption of thread suspension is supported).
+            /// </summary>
             public void Await()
             {
+                if (LockSupport.Interrupted())
+                {
+                    throw new ThreadInterruptedException();
+                }
+
                 Node node = AddConditionWaiter();
                 int savedState = parent.FullyRelease(node);
                 int interruptMode = 0;
@@ -2016,13 +2018,18 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
              * @throws ThreadInterruptedException if the current thread is interrupted (and
              * interruption of thread suspension is supported).
              */
-            public long Await(long timeout)
+            public int Await(int timeout)
             {
                 return Await(TimeSpan.FromMilliseconds(timeout));
             }
 
-            public long Await(TimeSpan timeout)
+            public int Await(TimeSpan timeout)
             {
+                if (LockSupport.Interrupted())
+                {
+                    throw new ThreadInterruptedException();
+                }
+
                 TimeSpan originalTimeout = timeout;
                 Node node = AddConditionWaiter();
                 int savedState = parent.FullyRelease(node);
@@ -2075,7 +2082,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                     ReportInterruptAfterWait(interruptMode);
                 }
 
-                return (long)(originalTimeout - timeout).TotalMilliseconds;
+                return (int)(originalTimeout - timeout).TotalMilliseconds;
             }
     
             /**
@@ -2102,6 +2109,11 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
              */
             public bool AwaitUntil(DateTime deadline)
             {
+                if (LockSupport.Interrupted())
+                {
+                    throw new ThreadInterruptedException();
+                }
+
                 Node node = AddConditionWaiter();
                 int savedState = parent.FullyRelease(node);
                 bool timedout = false;
@@ -2114,7 +2126,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                         timedout = parent.TransferAfterCancelledWait(node);
                         break;
                     }
+
                     LockSupport.ParkUntil(deadline);
+
                     if ((interruptMode = CheckInterruptWhileWaiting(node)) != 0)
                     {
                         break;
@@ -2137,12 +2151,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 return !timedout;
             }
 
-            /**
-             * Returns true if this condition was created by the given
-             * synchronization object.
-             *
-             * @return {@code true} if owned
-             */
+            /// <summary>
+            /// Returns true if this condition was created by the given synchronization object.
+            /// </summary>
             internal bool IsOwnedBy(AbstractQueuedSynchronizer sync)
             {
                 return ReferenceEquals(sync, parent);

@@ -25,9 +25,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 
         void AwaitUninterruptibly();
 
-        long Await(long timeout);
+        int Await(int timeout);
 
-        long Await(TimeSpan timeout);
+        int Await(TimeSpan timeout);
 
         bool AwaitUntil(DateTime deadline);
 

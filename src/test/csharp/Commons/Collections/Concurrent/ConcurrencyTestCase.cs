@@ -46,12 +46,48 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
         protected static readonly Object m6 = -6;
         protected static readonly Object m10 = -10;
 
+        internal bool threadFailed = false;
+
+        public static int SHORT_DELAY_MS;
+        public static int SMALL_DELAY_MS;
+        public static int MEDIUM_DELAY_MS;
+        public static int LONG_DELAY_MS;
+
+        protected virtual int GetShortDelay()
+        {
+            return 50;
+        }
+
+        protected virtual void SetDelays()
+        {
+            SHORT_DELAY_MS = GetShortDelay();
+            SMALL_DELAY_MS = SHORT_DELAY_MS * 5;
+            MEDIUM_DELAY_MS = SHORT_DELAY_MS * 10;
+            LONG_DELAY_MS = SHORT_DELAY_MS * 50;
+        }
+
+        public virtual void SetUp()
+        {
+            SetDelays();
+            threadFailed = false;
+        }
+
+        public virtual void TearDown()
+        {
+            Assert.IsFalse(threadFailed);
+        }
+
         /// <summary>
         /// Fails with message Shoulds the throw exception.
         /// </summary>
         public void ShouldThrow()
         {
             Assert.Fail("Should throw exception");
+        }
+
+        public void ThreadShouldThrow()
+        {
+            threadFailed = true;
         }
 
         /// <summary>
@@ -62,6 +98,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             Assert.Fail("Unexpected exception");
         }
 
+        public void UnexpectedException(Exception e)
+        {
+            Assert.Fail("Unexpected exception: type[{0}] - {1}", e.GetType(), e.Message);
+        }
     }
 }
 

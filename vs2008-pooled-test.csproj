@@ -53,6 +53,7 @@
     <Folder Include="src\test\csharp\Commons\Collections\Concurrent\" />
     <Folder Include="src\test\csharp\Commons\Pool\" />
     <Folder Include="src\test\csharp\Commons\Pool\Impl\" />
+    <Folder Include="src\test\csharp\Commons\Collections\Concurrent\Locks\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\test\csharp\MessageProducerTest.cs" />
@@ -81,5 +82,6 @@
     <Compile Include="src\test\csharp\Commons\Collections\LinkedHashSetTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\Concurrent\CopyOnWriteArrayListTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\Concurrent\CopyOnWriteArraySetTest.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\Concurrent\Locks\AbstractQueuedSynchronizerTest.cs" />
   </ItemGroup>
 </Project>

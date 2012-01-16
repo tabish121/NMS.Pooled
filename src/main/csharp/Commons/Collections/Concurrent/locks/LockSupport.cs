@@ -43,6 +43,16 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         /// </summary>
         public static void Park()
         {
+            EventWaitHandle parkToken = GetParkToken();
+            try
+            {
+                parkToken.WaitOne();
+            }
+            catch (ThreadInterruptedException)
+            {
+                SetInterrupted();
+            }
+            parkToken.Reset();
         }
 
         /// <summary>
@@ -54,8 +64,23 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         /// thread as the target; or Some other thread interrupts the current thread;
         /// or The call spuriously (that is, for no reason) returns.
         /// </summary>
-        public static void Park(long deadline)
+        public static void Park(int deadline)
         {
+            if (deadline <= 0)
+            {
+                return;
+            }
+
+            EventWaitHandle parkToken = GetParkToken();
+            try
+            {
+                parkToken.WaitOne(deadline, false);
+            }
+            catch (ThreadInterruptedException)
+            {
+                SetInterrupted();
+            }
+            parkToken.Reset();
         }
 
         /// <summary>
@@ -69,6 +94,16 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         /// </summary>
         public static void Park(TimeSpan deadline)
         {
+            EventWaitHandle parkToken = GetParkToken();
+            try
+            {
+                parkToken.WaitOne((int) deadline.TotalMilliseconds, false);
+            }
+            catch (ThreadInterruptedException)
+            {
+                SetInterrupted();
+            }
+            parkToken.Reset();
         }
 
         /// <summary>
@@ -82,6 +117,22 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         /// </summary>
         public static void ParkUntil(DateTime deadline)
         {
+            if (deadline < DateTime.Now)
+            {
+                return;
+            }
+
+            TimeSpan interval = deadline - DateTime.Now;
+            EventWaitHandle parkToken = GetParkToken();
+            try
+            {
+                parkToken.WaitOne((int) interval.TotalMilliseconds, false);
+            }
+            catch (ThreadInterruptedException)
+            {
+                SetInterrupted();
+            }
+            parkToken.Reset();
         }
 
         /// <summary>
@@ -89,6 +140,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         /// </summary>
         public static void ParkNanos(long nanos)
         {
+            TimeSpan interval = TimeSpan.FromTicks(nanos / 100);
+            EventWaitHandle parkToken = GetParkToken();
+            parkToken.WaitOne((int) interval.TotalMilliseconds, false);
+            parkToken.Reset();
         }
 
         /// <summary>
@@ -99,6 +154,59 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         /// </summary>
         public static void UnPark(Thread theThread)
         {
+            EventWaitHandle parkToken = GetParkToken();
+            parkToken.Set();
+        }
+
+        /// <summary>
+        /// Tests whether the thread has been interrupted while parked. The interrupted
+        /// status of the thread is cleared by this method. In other words, if this method
+        /// were to be called twice in succession, the second call would return false
+        /// (unless the current thread were interrupted again, after the first call had
+        /// cleared its interrupted status and before the second call had examined it).
+        /// </summary>
+        public static bool Interrupted()
+        {
+            bool interrupted = false;
+
+            lock(mutex)
+            {
+                LocalDataStoreSlot slot = Thread.GetNamedDataSlot("Interrupted");
+                if (Thread.GetData(slot) != null)
+                {
+                    interrupted = true;
+                }
+                Thread.SetData(slot, null);
+            }
+
+            return interrupted;
+        }
+
+        private static void SetInterrupted()
+        {
+            lock(mutex)
+            {
+                LocalDataStoreSlot slot = Thread.GetNamedDataSlot("Interrupted");
+                Thread.SetData(slot, true);
+            }
+        }
+
+        private static EventWaitHandle GetParkToken()
+        {
+            EventWaitHandle parkToken;
+
+            lock(mutex)
+            {
+                LocalDataStoreSlot slot = Thread.GetNamedDataSlot("ParkToken");
+                parkToken = Thread.GetData(slot) as EventWaitHandle;
+                if (parkToken == null)
+                {
+                    parkToken = new ManualResetEvent(false);
+                    Thread.SetData(slot, parkToken);
+                }
+            }
+
+            return parkToken;
         }
     }
 }
