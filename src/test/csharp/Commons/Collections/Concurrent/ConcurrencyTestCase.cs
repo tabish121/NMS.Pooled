@@ -90,6 +90,11 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             threadFailed = true;
         }
 
+        public void ThreadUnexpectedException()
+        {
+            threadFailed = true;
+        }
+
         /// <summary>
         /// Fails with message Unexpected Exception.
         /// </summary>

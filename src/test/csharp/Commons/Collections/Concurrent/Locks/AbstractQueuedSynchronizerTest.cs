@@ -170,6 +170,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 t1.Join();
                 t2.Join();
             }
+            catch(AssertionException)
+            {
+                throw;
+            }
             catch(Exception e)
             {
                 UnexpectedException(e);

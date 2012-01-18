@@ -33,9 +33,6 @@
     <Reference Include="Apache.NMS">
       <HintPath>lib\Apache.NMS\mono-2.0\Apache.NMS.dll</HintPath>
     </Reference>
-    <Reference Include="Apache.NMS.Pooled">
-      <HintPath>build\mono-2.0\debug\Apache.NMS.Pooled.dll</HintPath>
-    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>lib\NUnit\mono-2.0\nunit.framework.dll</HintPath>
     </Reference>
@@ -83,5 +80,12 @@
     <Compile Include="src\test\csharp\Commons\Collections\Concurrent\CopyOnWriteArrayListTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\Concurrent\CopyOnWriteArraySetTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\Concurrent\Locks\AbstractQueuedSynchronizerTest.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\Concurrent\Locks\LockSupportTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="vs2008-pooled.csproj">
+      <Project>{2C74A762-F175-4475-8C59-4E4C232F176E}</Project>
+      <Name>vs2008-pooled</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

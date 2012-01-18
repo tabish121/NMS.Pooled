@@ -30,7 +30,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
     /// </summary>
     public static class LockSupport
     {
-        private static object mutex = new object();
+        private static readonly Mutex mutex = new Mutex();
 
         /// <summary>
         /// Disables the current thread for thread scheduling purposes unless the
@@ -43,16 +43,21 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         /// </summary>
         public static void Park()
         {
-            EventWaitHandle parkToken = GetParkToken();
-            try
+            lock(mutex)
             {
-                parkToken.WaitOne();
+                EventWaitHandle parkToken = GetParkToken();
+                try
+                {
+                    mutex.ReleaseMutex();
+                    parkToken.WaitOne();
+                    mutex.WaitOne();
+                }
+                catch (ThreadInterruptedException)
+                {
+                    SetInterrupted();
+                }
+                parkToken.Reset();
             }
-            catch (ThreadInterruptedException)
-            {
-                SetInterrupted();
-            }
-            parkToken.Reset();
         }
 
         /// <summary>
@@ -71,16 +76,21 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 return;
             }
 
-            EventWaitHandle parkToken = GetParkToken();
-            try
+            lock(mutex)
             {
-                parkToken.WaitOne(deadline, false);
+                EventWaitHandle parkToken = GetParkToken();
+                try
+                {
+                    mutex.ReleaseMutex();
+                    parkToken.WaitOne(deadline, false);
+                    mutex.WaitOne();
+                }
+                catch (ThreadInterruptedException)
+                {
+                    SetInterrupted();
+                }
+                parkToken.Reset();
             }
-            catch (ThreadInterruptedException)
-            {
-                SetInterrupted();
-            }
-            parkToken.Reset();
         }
 
         /// <summary>
@@ -95,15 +105,20 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         public static void Park(TimeSpan deadline)
         {
             EventWaitHandle parkToken = GetParkToken();
-            try
+            lock(mutex)
             {
-                parkToken.WaitOne((int) deadline.TotalMilliseconds, false);
+                try
+                {
+                    mutex.ReleaseMutex();
+                    parkToken.WaitOne((int) deadline.TotalMilliseconds, false);
+                    mutex.WaitOne();
+                }
+                catch (ThreadInterruptedException)
+                {
+                    SetInterrupted();
+                }
+                parkToken.Reset();
             }
-            catch (ThreadInterruptedException)
-            {
-                SetInterrupted();
-            }
-            parkToken.Reset();
         }
 
         /// <summary>
@@ -123,16 +138,21 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             }
 
             TimeSpan interval = deadline - DateTime.Now;
-            EventWaitHandle parkToken = GetParkToken();
-            try
+            lock(mutex)
             {
-                parkToken.WaitOne((int) interval.TotalMilliseconds, false);
+                EventWaitHandle parkToken = GetParkToken();
+                try
+                {
+                    mutex.ReleaseMutex();
+                    parkToken.WaitOne((int) interval.TotalMilliseconds, false);
+                    mutex.WaitOne();
+                }
+                catch (ThreadInterruptedException)
+                {
+                    SetInterrupted();
+                }
+                parkToken.Reset();
             }
-            catch (ThreadInterruptedException)
-            {
-                SetInterrupted();
-            }
-            parkToken.Reset();
         }
 
         /// <summary>
@@ -140,10 +160,22 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         /// </summary>
         public static void ParkNanos(long nanos)
         {
-            TimeSpan interval = TimeSpan.FromTicks(nanos / 100);
-            EventWaitHandle parkToken = GetParkToken();
-            parkToken.WaitOne((int) interval.TotalMilliseconds, false);
-            parkToken.Reset();
+            lock(mutex)
+            {
+                TimeSpan interval = TimeSpan.FromTicks(nanos / 100);
+                EventWaitHandle parkToken = GetParkToken();
+                try
+                {
+                    mutex.ReleaseMutex();
+                    parkToken.WaitOne((int) interval.TotalMilliseconds, false);
+                    mutex.WaitOne();
+                }
+                catch (ThreadInterruptedException)
+                {
+                    SetInterrupted();
+                }
+                parkToken.Reset();
+            }
         }
 
         /// <summary>
@@ -154,8 +186,11 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         /// </summary>
         public static void UnPark(Thread theThread)
         {
-            EventWaitHandle parkToken = GetParkToken();
-            parkToken.Set();
+            lock(mutex)
+            {
+                EventWaitHandle parkToken = GetParkToken();
+                parkToken.Set();
+            }
         }
 
         /// <summary>
@@ -184,26 +219,20 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 
         private static void SetInterrupted()
         {
-            lock(mutex)
-            {
-                LocalDataStoreSlot slot = Thread.GetNamedDataSlot("Interrupted");
-                Thread.SetData(slot, true);
-            }
+            LocalDataStoreSlot slot = Thread.GetNamedDataSlot("Interrupted");
+            Thread.SetData(slot, true);
         }
 
         private static EventWaitHandle GetParkToken()
         {
             EventWaitHandle parkToken;
 
-            lock(mutex)
+            LocalDataStoreSlot slot = Thread.GetNamedDataSlot("ParkToken");
+            parkToken = Thread.GetData(slot) as EventWaitHandle;
+            if (parkToken == null)
             {
-                LocalDataStoreSlot slot = Thread.GetNamedDataSlot("ParkToken");
-                parkToken = Thread.GetData(slot) as EventWaitHandle;
-                if (parkToken == null)
-                {
-                    parkToken = new ManualResetEvent(false);
-                    Thread.SetData(slot, parkToken);
-                }
+                parkToken = new ManualResetEvent(false);
+                Thread.SetData(slot, parkToken);
             }
 
             return parkToken;
