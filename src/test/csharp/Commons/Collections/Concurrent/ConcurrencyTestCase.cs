@@ -105,6 +105,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
 
         public void UnexpectedException(Exception e)
         {
+            if (e is AssertionException)
+            {
+                throw e;
+            }
             Assert.Fail("Unexpected exception: type[{0}] - {1}", e.GetType(), e.Message);
         }
     }

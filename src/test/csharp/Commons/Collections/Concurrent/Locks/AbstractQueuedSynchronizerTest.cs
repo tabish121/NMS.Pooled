@@ -194,228 +194,235 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             }
         }
 
-//        [Test]
-//        public void TestIsQueued()
-//        {
-//            Mutex sync = new Mutex();
-//            Thread t1 = new Thread(InterruptedSyncRunnable);
-//            Thread t2 = new Thread(InterruptibleSyncRunnable);
-//            try
-//            {
-//                Assert.IsFalse(sync.IsQueued(t1));
-//                Assert.IsFalse(sync.IsQueued(t2));
-//                sync.Acquire(1);
-//                t1.Start(sync);
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.IsQueued(t1));
-//                t2.Start(sync);
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.IsQueued(t1));
-//                Assert.IsTrue(sync.IsQueued(t2));
-//                t1.Interrupt();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsFalse(sync.IsQueued(t1));
-//                Assert.IsTrue(sync.IsQueued(t2));
-//                sync.Release(1);
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsFalse(sync.IsQueued(t1));
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsFalse(sync.IsQueued(t2));
-//                t1.Join();
-//                t2.Join();
-//            }
-//            catch(Exception)
-//            {
-//                UnexpectedException();
-//            }
-//        }
-//
-//        [Test]
-//        public void TestGetFirstQueuedThread()
-//        {
-//            Mutex sync = new Mutex();
-//            Thread t1 = new Thread(new InterruptedSyncRunnable(sync));
-//            Thread t2 = new Thread(new InterruptibleSyncRunnable(sync));
-//            try
-//            {
-//                Assert.IsNull(sync.getFirstQueuedThread());
-//                sync.Acquire(1);
-//                t1.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.AreEqual(t1, sync.getFirstQueuedThread());
-//                t2.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.AreEqual(t1, sync.getFirstQueuedThread());
-//                t1.Interrupt();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.AreEqual(t2, sync.getFirstQueuedThread());
-//                sync.Release(1);
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsNull(sync.getFirstQueuedThread());
-//                t1.Join();
-//                t2.Join();
-//            }
-//            catch(Exception)
-//            {
-//                UnexpectedException();
-//            }
-//        }
-//
-//        [Test]
-//        public void TestHasContended()
-//        {
-//            Mutex sync = new Mutex();
-//            Thread t1 = new Thread(new InterruptedSyncRunnable(sync));
-//            Thread t2 = new Thread(new InterruptibleSyncRunnable(sync));
-//            try
-//            {
-//                Assert.IsFalse(sync.hasContended());
-//                sync.Acquire(1);
-//                t1.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.hasContended());
-//                t2.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.hasContended());
-//                t1.Interrupt();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.hasContended());
-//                sync.Release(1);
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.hasContended());
-//                t1.Join();
-//                t2.Join();
-//            }
-//            catch(Exception)
-//            {
-//                UnexpectedException();
-//            }
-//        }
-//
-//        [Test]
-//        public void TestGetQueuedThreads()
-//        {
-//            Mutex sync = new Mutex();
-//            Thread t1 = new Thread(new InterruptedSyncRunnable(sync));
-//            Thread t2 = new Thread(new InterruptibleSyncRunnable(sync));
-//            try
-//            {
-//                Assert.IsTrue(sync.getQueuedThreads().IsEmpty());
-//                sync.Acquire(1);
-//                Assert.IsTrue(sync.getQueuedThreads().IsEmpty());
-//                t1.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.getQueuedThreads().Contains(t1));
-//                t2.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.getQueuedThreads().Contains(t1));
-//                Assert.IsTrue(sync.getQueuedThreads().Contains(t2));
-//                t1.Interrupt();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsFalse(sync.getQueuedThreads().Contains(t1));
-//                Assert.IsTrue(sync.getQueuedThreads().Contains(t2));
-//                sync.Release(1);
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.getQueuedThreads().IsEmpty());
-//                t1.Join();
-//                t2.Join();
-//            }
-//            catch(Exception)
-//            {
-//                UnexpectedException();
-//            }
-//        } 
-//    
-//        [Test]
-//        public void TestGetExclusiveQueuedThreads()
-//        {
-//            Mutex sync = new Mutex();
-//            Thread t1 = new Thread(new InterruptedSyncRunnable(sync));
-//            Thread t2 = new Thread(new InterruptibleSyncRunnable(sync));
-//            try
-//            {
-//                Assert.IsTrue(sync.getExclusiveQueuedThreads().IsEmpty());
-//                sync.Acquire(1);
-//                Assert.IsTrue(sync.getExclusiveQueuedThreads().IsEmpty());
-//                t1.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.getExclusiveQueuedThreads().Contains(t1));
-//                t2.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.getExclusiveQueuedThreads().Contains(t1));
-//                Assert.IsTrue(sync.getExclusiveQueuedThreads().Contains(t2));
-//                t1.Interrupt();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsFalse(sync.getExclusiveQueuedThreads().Contains(t1));
-//                Assert.IsTrue(sync.getExclusiveQueuedThreads().Contains(t2));
-//                sync.Release(1);
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.getExclusiveQueuedThreads().IsEmpty());
-//                t1.Join();
-//                t2.Join();
-//            }
-//            catch (Exception)
-//            {
-//                UnexpectedException();
-//            }
-//        } 
-//
-//        [Test]
-//        public void TestGetSharedQueuedThreads()
-//        {
-//            Mutex sync = new Mutex();
-//            Thread t1 = new Thread(new InterruptedSyncRunnable(sync));
-//            Thread t2 = new Thread(new InterruptibleSyncRunnable(sync));
-//            try {
-//                Assert.IsTrue(sync.GetSharedQueuedThreads().IsEmpty());
-//                sync.Acquire(1);
-//                Assert.IsTrue(sync.GetSharedQueuedThreads().IsEmpty());
-//                t1.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.GetSharedQueuedThreads().IsEmpty());
-//                t2.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.GetSharedQueuedThreads().IsEmpty());
-//                t1.Interrupt();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.GetSharedQueuedThreads().IsEmpty());
-//                sync.Release(1);
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.GetSharedQueuedThreads().IsEmpty());
-//                t1.Join();
-//                t2.Join();
-//            }
-//            catch(Exception)
-//            {
-//                UnexpectedException();
-//            }
-//        }
-//
-//        [Test]
-//        public void TestInterruptedException2()
-//        {
-//            Mutex sync = new Mutex();
-//            sync.Acquire(1);
-//            Thread t = new Thread(new Runnable() {
-//                        public void run() {
-//                            try {
-//                 sync.TryAcquireNanos(1, MEDIUM_DELAY_MS * 1000 * 1000);
-//                 threadShouldThrow();
-//                 } catch(ThreadInterruptedException){}
-//             }
-//             });
-//            try
-//            {
-//                t.Start();
-//                t.Interrupt();
-//            }
-//            catch(Exception)
-//            {
-//                UnexpectedException();
-//            }
-//        }
-//
+        [Test]
+        public void TestIsQueued()
+        {
+            Mutex sync = new Mutex();
+            Thread t1 = new Thread(InterruptedSyncRunnable);
+            Thread t2 = new Thread(InterruptibleSyncRunnable);
+            try
+            {
+                Assert.IsFalse(sync.IsQueued(t1));
+                Assert.IsFalse(sync.IsQueued(t2));
+                sync.Acquire(1);
+                t1.Start(sync);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.IsQueued(t1));
+                t2.Start(sync);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.IsQueued(t1));
+                Assert.IsTrue(sync.IsQueued(t2));
+                t1.Interrupt();
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsFalse(sync.IsQueued(t1));
+                Assert.IsTrue(sync.IsQueued(t2));
+                sync.Release(1);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsFalse(sync.IsQueued(t1));
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsFalse(sync.IsQueued(t2));
+                t1.Join();
+                t2.Join();
+            }
+            catch(Exception e)
+            {
+                UnexpectedException(e);
+            }
+        }
+
+        [Test]
+        public void TestGetFirstQueuedThread()
+        {
+            Mutex sync = new Mutex();
+            Thread t1 = new Thread(InterruptedSyncRunnable);
+            Thread t2 = new Thread(InterruptibleSyncRunnable);
+            try
+            {
+                Assert.IsNull(sync.FirstQueuedThread);
+                sync.Acquire(1);
+                t1.Start(sync);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.AreEqual(t1, sync.FirstQueuedThread);
+                t2.Start(sync);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.AreEqual(t1, sync.FirstQueuedThread);
+                t1.Interrupt();
+                Thread.Sleep(SHORT_DELAY_MS);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.AreEqual(t2, sync.FirstQueuedThread);
+                sync.Release(1);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsNull(sync.FirstQueuedThread);
+                t1.Join();
+                t2.Join();
+            }
+            catch(Exception e)
+            {
+                UnexpectedException(e);
+            }
+        }
+
+        [Test]
+        public void TestHasContended()
+        {
+            Mutex sync = new Mutex();
+            Thread t1 = new Thread(InterruptedSyncRunnable);
+            Thread t2 = new Thread(InterruptibleSyncRunnable);
+            try
+            {
+                Assert.IsFalse(sync.HasContended);
+                sync.Acquire(1);
+                t1.Start(sync);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.HasContended);
+                t2.Start(sync);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.HasContended);
+                t1.Interrupt();
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.HasContended);
+                sync.Release(1);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.HasContended);
+                t1.Join();
+                t2.Join();
+            }
+            catch(Exception e)
+            {
+                UnexpectedException(e);
+            }
+        }
+
+        [Test]
+        public void TestGetQueuedThreads()
+        {
+            Mutex sync = new Mutex();
+            Thread t1 = new Thread(InterruptedSyncRunnable);
+            Thread t2 = new Thread(InterruptibleSyncRunnable);
+            try
+            {
+                Assert.IsTrue(sync.QueuedThreads.IsEmpty());
+                sync.Acquire(1);
+                Assert.IsTrue(sync.QueuedThreads.IsEmpty());
+                t1.Start(sync);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.QueuedThreads.Contains(t1));
+                t2.Start(sync);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.QueuedThreads.Contains(t1));
+                Assert.IsTrue(sync.QueuedThreads.Contains(t2));
+                t1.Interrupt();
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsFalse(sync.QueuedThreads.Contains(t1));
+                Assert.IsTrue(sync.QueuedThreads.Contains(t2));
+                sync.Release(1);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.QueuedThreads.IsEmpty());
+                t1.Join();
+                t2.Join();
+            }
+            catch(Exception e)
+            {
+                UnexpectedException(e);
+            }
+        } 
+    
+        [Test]
+        public void TestGetExclusiveQueuedThreads()
+        {
+            Mutex sync = new Mutex();
+            Thread t1 = new Thread(InterruptedSyncRunnable);
+            Thread t2 = new Thread(InterruptibleSyncRunnable);
+            try
+            {
+                Assert.IsTrue(sync.ExclusiveQueuedThreads.IsEmpty());
+                sync.Acquire(1);
+                Assert.IsTrue(sync.ExclusiveQueuedThreads.IsEmpty());
+                t1.Start(sync);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.ExclusiveQueuedThreads.Contains(t1));
+                t2.Start(sync);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.ExclusiveQueuedThreads.Contains(t1));
+                Assert.IsTrue(sync.ExclusiveQueuedThreads.Contains(t2));
+                t1.Interrupt();
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsFalse(sync.ExclusiveQueuedThreads.Contains(t1));
+                Assert.IsTrue(sync.ExclusiveQueuedThreads.Contains(t2));
+                sync.Release(1);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.ExclusiveQueuedThreads.IsEmpty());
+                t1.Join();
+                t2.Join();
+            }
+            catch (Exception e)
+            {
+                UnexpectedException(e);
+            }
+        } 
+
+        [Test]
+        public void TestGetSharedQueuedThreads()
+        {
+            Mutex sync = new Mutex();
+            Thread t1 = new Thread(InterruptedSyncRunnable);
+            Thread t2 = new Thread(InterruptibleSyncRunnable);
+            try {
+                Assert.IsTrue(sync.SharedQueuedThreads.IsEmpty());
+                sync.Acquire(1);
+                Assert.IsTrue(sync.SharedQueuedThreads.IsEmpty());
+                t1.Start(sync);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.SharedQueuedThreads.IsEmpty());
+                t2.Start(sync);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.SharedQueuedThreads.IsEmpty());
+                t1.Interrupt();
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.SharedQueuedThreads.IsEmpty());
+                sync.Release(1);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.SharedQueuedThreads.IsEmpty());
+                t1.Join();
+                t2.Join();
+            }
+            catch(Exception e)
+            {
+                UnexpectedException(e);
+            }
+        }
+
+        private void TestInterruptedException2Rannable(Object state)
+        {
+            try
+            {
+                Mutex sync = state as Mutex;
+                sync.TryAcquire(1, MEDIUM_DELAY_MS);
+                ThreadShouldThrow();
+            }
+            catch(ThreadInterruptedException)
+            {
+            }
+        }
+
+        [Test]
+        public void TestInterruptedException2()
+        {
+            Mutex sync = new Mutex();
+            sync.Acquire(1);
+            Thread t = new Thread(TestInterruptedException2Rannable);
+
+            try
+            {
+                t.Start(sync);
+                t.Interrupt();
+            }
+            catch(Exception e)
+            {
+                UnexpectedException(e);
+            }
+        }
+
 //        [Test]
 //        public void TestTryAcquireWhenSynced()
 //        {
