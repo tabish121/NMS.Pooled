@@ -70,12 +70,12 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 return State != 0;
             }
 
-            public new int TryAcquireShared(int ignore)
+            protected override int TryAcquireShared(int ignore)
             {
                 return IsSignalled() ? 1 : -1;
             }
 
-            public new bool TryReleaseShared(int ignore)
+            protected override bool TryReleaseShared(int ignore)
             {
                 State = 1;
                 return true;
@@ -92,6 +92,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             catch(ThreadInterruptedException)
             {
             }
+            catch(Exception e)
+            {
+                ThreadUnexpectedException(e);
+            }
         }
 
         private void InterruptedSyncRunnable(Object state)
@@ -100,10 +104,14 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             {
                 Mutex sync = state as Mutex;
                 sync.AcquireInterruptibly(1);
-                ThreadShouldThrow();
+                ThreadShouldThrow("InterruptedSyncRunnable should have been interrupted in Acquire");
             }
             catch(ThreadInterruptedException)
             {
+            }
+            catch(Exception e)
+            {
+                ThreadUnexpectedException(e);
             }
         }
 
@@ -392,30 +400,35 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             }
         }
 
-        private void TestInterruptedException2Rannable(Object state)
+        private void TestThreadInterruptedException2Rannable(Object state)
         {
             try
             {
                 Mutex sync = state as Mutex;
                 sync.TryAcquire(1, MEDIUM_DELAY_MS);
-                ThreadShouldThrow();
+                ThreadShouldThrow("TestThreadInterruptedException2Rannable should have been interrupted");
             }
             catch(ThreadInterruptedException)
             {
             }
+            catch(Exception e)
+            {
+                ThreadUnexpectedException(e);
+            }
         }
 
         [Test]
-        public void TestInterruptedException2()
+        public void TestThreadInterruptedException2()
         {
             Mutex sync = new Mutex();
             sync.Acquire(1);
-            Thread t = new Thread(TestInterruptedException2Rannable);
+            Thread t = new Thread(TestThreadInterruptedException2Rannable);
 
             try
             {
                 t.Start(sync);
                 t.Interrupt();
+                t.Join();
             }
             catch(Exception e)
             {
@@ -636,7 +649,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 //                        c.Await();
 //                        sync.Release(1);
 //                    }
-//                    catch(InterruptedException)
+//                    catch(ThreadInterruptedException)
 //                    {
 //                        ThreadUnexpectedException();
 //                    }
@@ -849,7 +862,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 //                        c.Await();
 //                        sync.Release(1);
 //                    }
-//                    catch(InterruptedException)
+//                    catch(ThreadInterruptedException)
 //                    {
 //                        ThreadUnexpectedException();
 //                    }
@@ -895,7 +908,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 //                        c.Await();
 //                        sync.Release(1);
 //                    }
-//                    catch(InterruptedException)
+//                    catch(ThreadInterruptedException)
 //                    {
 //                        ThreadUnexpectedException();
 //                    }
@@ -907,12 +920,12 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 //         public void run() {
 //             try {
 //             sync.Acquire(1);
-//                            threadAssertTrue(sync.HasWaiters(c));
+//                            ThreadAssertTrue(sync.HasWaiters(c));
 //                            threadAssertEquals(1, sync.getWaitQueueLength(c));
 //                            c.Await();
 //                            sync.Release(1);
 //             }
-//             catch(InterruptedException) {
+//             catch(ThreadInterruptedException) {
 //                            ThreadUnexpectedException();
 //                        }
 //         }
@@ -952,11 +965,11 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 //         public void run() {
 //             try {
 //             sync.Acquire(1);
-//                            threadAssertTrue(sync.getWaitingThreads(c).IsEmpty());
+//                            ThreadAssertTrue(sync.getWaitingThreads(c).IsEmpty());
 //                            c.Await();
 //                            sync.Release(1);
 //             }
-//             catch(InterruptedException) {
+//             catch(ThreadInterruptedException) {
 //                            ThreadUnexpectedException();
 //                        }
 //         }
@@ -970,7 +983,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 //                            c.Await();
 //                            sync.Release(1);
 //             }
-//             catch(InterruptedException) {
+//             catch(ThreadInterruptedException) {
 //                            ThreadUnexpectedException();
 //                        }
 //         }
@@ -1046,7 +1059,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 //                            sync.Release(1);
 //                            threadShouldThrow();
 //             }
-//             catch(ThreadInterruptedException) {
+//             catch(ThreadThreadInterruptedException) {
 //                        }
 //         }
 //         });
@@ -1076,7 +1089,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 //                            sync.Release(1);
 //                            threadShouldThrow();
 //             }
-//             catch(ThreadInterruptedException) {
+//             catch(ThreadThreadInterruptedException) {
 //                        }
 //         }
 //         });
@@ -1107,7 +1120,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 //                            sync.Release(1);
 //                            threadShouldThrow();
 //             }
-//             catch(ThreadInterruptedException) {
+//             catch(ThreadThreadInterruptedException) {
 //                        }
 //         }
 //         });
@@ -1137,7 +1150,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 //                        c.Await();
 //                        sync.Release(1);
 //                    }
-//                    catch(InterruptedException)
+//                    catch(ThreadInterruptedException)
 //                    {
 //                         ThreadUnexpectedException();
 //                    }
@@ -1153,7 +1166,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 //                            c.Await();
 //                            sync.Release(1);
 //             }
-//             catch(InterruptedException) {
+//             catch(ThreadInterruptedException) {
 //                            ThreadUnexpectedException();
 //                        }
 //         }
@@ -1189,86 +1202,117 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             Assert.IsTrue(ls.IndexOf("State = 1") >= 0);
         }
 
-//        [Test]
-//        public void TestGetStateWithReleaseShared()
+        [Test]
+        public void TestGetStateWithReleaseShared()
+        {
+            BooleanLatch l = new BooleanLatch();
+            Assert.IsFalse(l.IsSignalled());
+            l.ReleaseShared(0);
+            Assert.IsTrue(l.IsSignalled());
+        }
+
+        [Test]
+        public void TestReleaseShared()
+        {
+            BooleanLatch l = new BooleanLatch();
+            Assert.IsFalse(l.IsSignalled());
+            l.ReleaseShared(0);
+            Assert.IsTrue(l.IsSignalled());
+            l.ReleaseShared(0);
+            Assert.IsTrue(l.IsSignalled());
+        }
+
+        private void TestAcquireSharedInterruptiblyRannable(Object state)
+        {
+            BooleanLatch l = state as BooleanLatch;
+
+            try
+            {
+                ThreadAssertFalse(l.IsSignalled());
+                l.AcquireSharedInterruptibly(0);
+                ThreadAssertTrue(l.IsSignalled());
+            }
+            catch(Exception e)
+            {
+                ThreadUnexpectedException(e);
+            }
+        }
+
+        [Test]
+        public void TestAcquireSharedInterruptibly()
+        {
+            BooleanLatch l = new BooleanLatch();
+
+            Thread t = new Thread(TestAcquireSharedInterruptiblyRannable);
+
+            try
+            {
+                t.Start(l);
+                Assert.IsFalse(l.IsSignalled());
+                Thread.Sleep(SHORT_DELAY_MS);
+                l.ReleaseShared(0);
+                Assert.IsTrue(l.IsSignalled());
+                t.Join();
+            }
+            catch (ThreadInterruptedException e)
+            {
+                UnexpectedException(e);
+            }
+        }
+
+        private void TestAsquireSharedTimedRannable(Object state)
+        {
+            BooleanLatch l = state as BooleanLatch;
+
+            try
+            {
+                ThreadAssertFalse(l.IsSignalled());
+                ThreadAssertTrue(l.TryAcquireShared(0, MEDIUM_DELAY_MS));
+                ThreadAssertTrue(l.IsSignalled());
+            }
+            catch(Exception e)
+            {
+                ThreadUnexpectedException(e);
+            }
+        }
+
+        [Test]
+        public void TestAsquireSharedTimed()
+        {
+            BooleanLatch l = new BooleanLatch();
+
+            Thread t = new Thread(TestAsquireSharedTimedRannable);
+            try
+            {
+                t.Start(l);
+                Assert.IsFalse(l.IsSignalled());
+                Thread.Sleep(SHORT_DELAY_MS);
+                l.ReleaseShared(0);
+                Assert.IsTrue(l.IsSignalled());
+                t.Join();
+            }
+            catch (ThreadInterruptedException e)
+            {
+                UnexpectedException(e);
+            }
+        }
+
+//        private void TestAcquireSharedInterruptiblyInterruptedExceptionRannable(Object state)
 //        {
-//     BooleanLatch l = new BooleanLatch();
-//     Assert.IsFalse(l.isSignalled());
-//     l.ReleaseShared(0);
-//     Assert.IsTrue(l.isSignalled());
-//        }
+//            BooleanLatch l = state as BooleanLatch;
 //
-//        [Test]
-//        public void TestReleaseShared()
-//        {
-//     BooleanLatch l = new BooleanLatch();
-//     Assert.IsFalse(l.isSignalled());
-//     l.ReleaseShared(0);
-//     Assert.IsTrue(l.isSignalled());
-//     l.ReleaseShared(0);
-//     Assert.IsTrue(l.isSignalled());
-//        }
-//
-//        [Test]
-//        public void TestAcquireSharedInterruptibly()
-//        {
-//     BooleanLatch l = new BooleanLatch();
-//    
-//     Thread t = new Thread(new Runnable() {
-//         public void run() {
-//             try {
-//                            ThreadAssertFalse(l.isSignalled());
-//             l.AcquireSharedInterruptibly(0);
-//                            threadAssertTrue(l.isSignalled());
-//             } catch(InterruptedException){
-//                            ThreadUnexpectedException();
-//                        }
-//         }
-//         });
 //            try
 //            {
-//                t.Start();
-//                Assert.IsFalse(l.isSignalled());
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                l.ReleaseShared(0);
-//                Assert.IsTrue(l.isSignalled());
-//                t.Join();
+//                ThreadAssertFalse(l.IsSignalled());
+//                ThreadAssertTrue(l.AcquireSharedInterruptibly(0));
+//                ThreadAssertTrue(l.IsSignalled());
 //            }
-//            catch (InterruptedException)
+//            catch(ThreadInterruptedException)
 //            {
-//                UnexpectedException();
 //            }
-//        }
-//
-//        [Test]
-//        public void TestAsquireSharedTimed()
-//        {
-//     BooleanLatch l = new BooleanLatch();
-//
-//     Thread t = new Thread(new Runnable() {
-//         public void run() {
-//             try {
-//                            ThreadAssertFalse(l.isSignalled());
-//             threadAssertTrue(l.TryAcquireSharedNanos(0, MEDIUM_DELAY_MS* 1000 * 1000));
-//                            threadAssertTrue(l.isSignalled());
-//    
-//             } catch(InterruptedException){
-//                            ThreadUnexpectedException();
-//                        }
-//         }
-//         });
-//            try
+//            catch(Exception e)
 //            {
-//                t.Start();
-//                Assert.IsFalse(l.isSignalled());
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                l.ReleaseShared(0);
-//                Assert.IsTrue(l.isSignalled());
-//                t.Join();
-//            }
-//            catch (InterruptedException)
-//            {
-//                UnexpectedException();
+//                ThreadUnexpectedException(e);
 //            }
 //        }
 //
@@ -1276,83 +1320,95 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 //        public void TestAcquireSharedInterruptiblyInterruptedException()
 //        {
 //            BooleanLatch l = new BooleanLatch();
-//            Thread t = new Thread(new Runnable() {
-//                    public void run() {
-//                        try {
-//                            ThreadAssertFalse(l.isSignalled());
-//                            l.AcquireSharedInterruptibly(0);
-//                            threadShouldThrow();
-//                        } catch(ThreadInterruptedException){}
-//                    }
-//                });
-//     t.Start();
+//
+//            Thread t = new Thread(TestAcquireSharedInterruptiblyInterruptedExceptionRannable);
+//
+//            t.Start(l);
+//
 //            try
 //            {
-//                Assert.IsFalse(l.isSignalled());
+//                Assert.IsFalse(l.IsSignalled());
 //                t.Interrupt();
 //                t.Join();
 //            }
-//            catch (InterruptedException)
-//            {
-//                UnexpectedException();
-//            }
-//        }
-//
-//        [Test]
-//        public void TestAcquireSharedNanosInterruptedException()
-//        {
-//            BooleanLatch l = new BooleanLatch();
-//            Thread t = new Thread(new Runnable() {
-//                    public void run() {
-//                        try {
-//                            ThreadAssertFalse(l.isSignalled());
-//                            l.TryAcquireSharedNanos(0, SMALL_DELAY_MS* 1000 * 1000);
-//                            threadShouldThrow();                        
-//                        } catch(ThreadInterruptedException){}
-//                    }
-//                });
-//            t.Start();
-//            try
-//            {
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsFalse(l.isSignalled());
-//                t.Interrupt();
-//                t.Join();
-//            }
-//            catch (InterruptedException)
-//            {
-//                UnexpectedException();
-//            }
-//        }
-//
-//        [Test]
-//        public void TestAcquireSharedNanosTimeout()
-//        {
-//            BooleanLatch l = new BooleanLatch();
-//            Thread t = new Thread(new Runnable()
-//            {
-//                    public void run() {
-//                        try {
-//                            ThreadAssertFalse(l.isSignalled());
-//                            ThreadAssertFalse(l.TryAcquireSharedNanos(0, SMALL_DELAY_MS* 1000 * 1000));
-//                        } catch(InterruptedException ie){
-//                            ThreadUnexpectedException();
-//                        }
-//                    }
-//                });
-//            t.Start();
-//            try
-//            {
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsFalse(l.isSignalled());
-//                t.Join();
-//            }
-//            catch (InterruptedException)
+//            catch (ThreadInterruptedException)
 //            {
 //                UnexpectedException();
 //            }
 //        }
 
+        private void TestAcquireSharedTimedInterruptedExceptionRannable(Object state)
+        {
+            BooleanLatch l = state as BooleanLatch;
+
+            try
+            {
+                ThreadAssertFalse(l.IsSignalled());
+                l.TryAcquireShared(0, SMALL_DELAY_MS);
+                ThreadShouldThrow();
+            }
+            catch(ThreadInterruptedException)
+            {
+            }
+            catch(Exception e)
+            {
+                ThreadUnexpectedException(e);
+            }
+        }
+
+        [Test]
+        public void TestAcquireSharedTimedInterruptedException()
+        {
+            BooleanLatch l = new BooleanLatch();
+            Thread t = new Thread(TestAcquireSharedTimedInterruptedExceptionRannable);
+            t.Start(l);
+
+            try
+            {
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsFalse(l.IsSignalled());
+                t.Interrupt();
+                t.Join();
+            }
+            catch (ThreadInterruptedException e)
+            {
+                UnexpectedException(e);
+            }
+        }
+
+        private void TestAcquireSharedTimedTimeoutRannable(Object state)
+        {
+            BooleanLatch l = state as BooleanLatch;
+
+            try
+            {
+                ThreadAssertFalse(l.IsSignalled());
+                ThreadAssertFalse(l.TryAcquireShared(0, SMALL_DELAY_MS));
+            }
+            catch(Exception e)
+            {
+                ThreadUnexpectedException(e);
+            }
+        }
+
+        [Test]
+        public void TestAcquireSharedTimedTimeout()
+        {
+            BooleanLatch l = new BooleanLatch();
+            Thread t = new Thread(TestAcquireSharedTimedTimeoutRannable);
+            t.Start(l);
+
+            try
+            {
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsFalse(l.IsSignalled());
+                t.Join();
+            }
+            catch (ThreadInterruptedException e)
+            {
+                UnexpectedException(e);
+            }
+        }
     }
 }
 

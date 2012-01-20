@@ -47,6 +47,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
         protected static readonly Object m10 = -10;
 
         internal bool threadFailed = false;
+        internal String threadFailedMessage = "";
 
         public static int SHORT_DELAY_MS;
         public static int SMALL_DELAY_MS;
@@ -55,7 +56,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
 
         protected virtual int GetShortDelay()
         {
-            return 50;
+            return 100;
         }
 
         protected virtual void SetDelays()
@@ -74,7 +75,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
 
         public virtual void TearDown()
         {
-            Assert.IsFalse(threadFailed);
+            Assert.IsFalse(threadFailed, "A thread failed: " + threadFailedMessage);
         }
 
         /// <summary>
@@ -85,14 +86,46 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             Assert.Fail("Should throw exception");
         }
 
+        public void ThreadAssertTrue(bool b)
+        {
+            if (!b)
+            {
+                threadFailed = true;
+                Assert.Fail("Thread assertion failed");
+            }
+        }
+
+        public void ThreadAssertFalse(bool b)
+        {
+            if (b)
+            {
+                threadFailed = true;
+                Assert.Fail("Thread assertion failed");
+            }
+        }
+
         public void ThreadShouldThrow()
         {
             threadFailed = true;
+            Assert.Fail("Thread should have thrown an Exception");
+        }
+
+        public void ThreadShouldThrow(String message)
+        {
+            threadFailed = true;
+            threadFailedMessage = message;
+            Assert.Fail(message);
         }
 
         public void ThreadUnexpectedException()
         {
             threadFailed = true;
+        }
+
+        public void ThreadUnexpectedException(Exception e)
+        {
+            threadFailed = true;
+            threadFailedMessage = e.Message;
         }
 
         /// <summary>
