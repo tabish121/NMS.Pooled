@@ -104,6 +104,28 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             }
         }
 
+        public void ThreadAssertEquals(object a, object b)
+        {
+            if (a == null && b == null)
+            {
+                return;
+            }
+
+            if ((a != null && b == null) || (b != null && a == null))
+            {
+                threadFailed = true;
+            }
+            else if(a != null && !a.Equals(b))
+            {
+                threadFailed = true;
+            }
+
+            if (threadFailed)
+            {
+                Assert.Fail("Thread assertion failed");
+            }
+        }
+
         public void ThreadShouldThrow()
         {
             threadFailed = true;

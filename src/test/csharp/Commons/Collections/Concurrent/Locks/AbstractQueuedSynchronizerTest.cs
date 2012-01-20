@@ -436,122 +436,152 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             }
         }
 
-//        [Test]
-//        public void TestTryAcquireWhenSynced()
-//        {
-//            Mutex sync = new Mutex();
-//            sync.Acquire(1);
-//            Thread t = new Thread(new Runnable() {
-//                    public void run() {
-//                        ThreadAssertFalse(sync.TryAcquire(1));
-//            }
-//            });
-//
-//            try
-//            {
-//                t.Start();
-//                t.Join();
-//                sync.Release(1);
-//            }
-//            catch(Exception)
-//            {
-//                UnexpectedException();
-//            }
-//        } 
-//
-//        [Test]
-//        public void TestAcquireNanosTimeout()
-//        {
-//            Mutex sync = new Mutex();
-//            sync.Acquire(1);
-//            Thread t = new Thread(new Runnable() {
-//                    public void run() {
-//             try {
-//                            ThreadAssertFalse(sync.TryAcquireNanos(1, 1000 * 1000));
-//                        } catch (Exception) {
-//                            ThreadUnexpectedException();
-//                        }
-//            }
-//            });
-//            try {
-//                t.Start();
-//                t.Join();
-//                sync.Release(1);
-//            } catch(Exception){
-//                UnexpectedException();
-//            }
-//        } 
-//
-//        [Test]
-//        public void TestGetState()
-//        {
-//            Mutex sync = new Mutex();
-//            sync.Acquire(1);
-//            Assert.IsTrue(sync.IsHeldExclusively);
-//            sync.Release(1);
-//            Assert.IsFalse(sync.IsHeldExclusively);
-//            Thread t = new Thread(new Runnable() {
-//            public void run() {
-//                sync.Acquire(1);
-//                try {
-//                    Thread.Sleep(SMALL_DELAY_MS);
-//                }
-//                catch(Exception) {
-//                    ThreadUnexpectedException();
-//                }
-//                sync.Release(1);
-//            }
-//            });
-//
-//            try
-//            {
-//                t.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                Assert.IsTrue(sync.IsHeldExclusively);
-//                t.Join();
-//                Assert.IsFalse(sync.IsHeldExclusively);
-//            } catch(Exception){
-//                UnexpectedException();
-//            }
-//        }
-//    
-//        [Test]
-//        public void TestAcquireInterruptibly1()
-//        {
-//            Mutex sync = new Mutex();
-//            sync.Acquire(1);
-//            Thread t = new Thread(new InterruptedSyncRunnable(sync));
-//            try {
-//                t.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                t.Interrupt();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                sync.Release(1);
-//                t.Join();
-//            } catch(Exception){
-//                UnexpectedException();
-//            }
-//        } 
-//    
-//        [Test]
-//        public void TestAcquireInterruptibly2()
-//        {
-//            Mutex sync = new Mutex();
-//            try {
-//                sync.AcquireInterruptibly(1);
-//            } catch(Exception) {
-//                UnexpectedException();
-//            }
-//            Thread t = new Thread(new InterruptedSyncRunnable(sync));
-//            try {
-//                t.Start();
-//                t.Interrupt();
-//                Assert.IsTrue(sync.IsHeldExclusively);
-//                t.Join();
-//            } catch(Exception){
-//                UnexpectedException();
-//            }
-//        }
+        private void TestTryAcquireWhenSyncedRunnable(object state)
+        {
+            Mutex sync = state as Mutex;
+            ThreadAssertFalse(sync.AccessTryAcquire(1));
+        }
+
+        [Test]
+        public void TestTryAcquireWhenSynced()
+        {
+            Mutex sync = new Mutex();
+            sync.Acquire(1);
+            Thread t = new Thread(TestTryAcquireWhenSyncedRunnable);
+
+            try
+            {
+                t.Start(sync);
+                t.Join();
+                sync.Release(1);
+            }
+            catch(Exception e)
+            {
+                UnexpectedException(e);
+            }
+        } 
+
+        private void TestAcquireTimedTimeoutRunnable(object state)
+        {
+            Mutex sync = state as Mutex;
+
+            try
+            {
+                ThreadAssertFalse(sync.TryAcquire(1, 1000));
+            }
+            catch (Exception e)
+            {
+                ThreadUnexpectedException(e);
+            }
+        }
+
+        [Test]
+        public void TestAcquireTimedTimeout()
+        {
+            Mutex sync = new Mutex();
+            sync.Acquire(1);
+            Thread t = new Thread(TestAcquireTimedTimeoutRunnable);
+
+            try
+            {
+                t.Start(sync);
+                t.Join();
+                sync.Release(1);
+            }
+            catch (Exception e)
+            {
+                UnexpectedException(e);
+            }
+        } 
+
+        private void TestGetStateRunnable(object state)
+        {
+            Mutex sync = state as Mutex;
+
+            sync.Acquire(1);
+            try
+            {
+                Thread.Sleep(SMALL_DELAY_MS);
+            }
+            catch(Exception e)
+            {
+                ThreadUnexpectedException(e);
+            }
+            sync.Release(1);
+        }
+
+        [Test]
+        public void TestGetState()
+        {
+            Mutex sync = new Mutex();
+            sync.Acquire(1);
+            Assert.IsTrue(sync.AccessIsHeldExclusively());
+            sync.Release(1);
+            Assert.IsFalse(sync.AccessIsHeldExclusively());
+            Thread t = new Thread(TestGetStateRunnable);
+
+            try
+            {
+                t.Start(sync);
+                Thread.Sleep(SHORT_DELAY_MS);
+                Assert.IsTrue(sync.AccessIsHeldExclusively());
+                t.Join();
+                Assert.IsFalse(sync.AccessIsHeldExclusively());
+            }
+            catch(Exception e)
+            {
+                UnexpectedException(e);
+            }
+        }
+
+        [Test]
+        public void TestAcquireInterruptibly1()
+        {
+            Mutex sync = new Mutex();
+            sync.Acquire(1);
+            Thread t = new Thread(InterruptedSyncRunnable);
+
+            try
+            {
+                t.Start(sync);
+                Thread.Sleep(SHORT_DELAY_MS);
+                t.Interrupt();
+                Thread.Sleep(SHORT_DELAY_MS);
+                sync.Release(1);
+                t.Join();
+            }
+            catch(Exception e)
+            {
+                UnexpectedException(e);
+            }
+        } 
+
+        [Test]
+        public void TestAcquireInterruptibly2()
+        {
+            Mutex sync = new Mutex();
+            try
+            {
+                sync.AcquireInterruptibly(1);
+            }
+            catch(Exception e)
+            {
+                UnexpectedException(e);
+            }
+
+            Thread t = new Thread(InterruptedSyncRunnable);
+            try
+            {
+                t.Start(sync);
+                t.Interrupt();
+                Assert.IsTrue(sync.AccessIsHeldExclusively());
+                t.Join();
+            }
+            catch(Exception e)
+            {
+                UnexpectedException(e);
+            }
+        }
 
         [Test]
         public void TestOwns()
@@ -637,40 +667,48 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             }
         }
 
-//        [Test]
-//        public void TestAwait()
-//        {
-//            Mutex sync = new Mutex();
-//            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
-//            Thread t = new Thread(new Runnable() {
-//                public void run() {
-//                    try {
-//                        sync.Acquire(1);
-//                        c.Await();
-//                        sync.Release(1);
-//                    }
-//                    catch(ThreadInterruptedException)
-//                    {
-//                        ThreadUnexpectedException();
-//                    }
-//                }
-//            });
-//
-//            try
-//            {
-//                t.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                sync.Acquire(1);
-//                c.Signal();
-//                sync.Release(1);
-//                t.Join(SHORT_DELAY_MS);
-//                Assert.IsFalse(t.isAlive());
-//            }
-//            catch (Exception)
-//            {
-//                UnexpectedException();
-//            }
-//        }
+        private void TestAwaitRunnable(object state)
+        {
+            Pair data = state as Pair;
+            Mutex sync = data.first as Mutex;
+            AbstractQueuedSynchronizer.ConditionObject c =
+                data.second as AbstractQueuedSynchronizer.ConditionObject;
+
+            try
+            {
+                sync.Acquire(1);
+                c.Await();
+                sync.Release(1);
+            }
+            catch(ThreadInterruptedException e)
+            {
+                ThreadUnexpectedException(e);
+            }
+        }
+
+        [Test]
+        public void TestAwait()
+        {
+            Mutex sync = new Mutex();
+            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
+            Pair data = new Pair(sync, c);
+            Thread t = new Thread(TestAwaitRunnable);
+
+            try
+            {
+                t.Start(data);
+                Thread.Sleep(SHORT_DELAY_MS);
+                sync.Acquire(1);
+                c.Signal();
+                sync.Release(1);
+                t.Join(SHORT_DELAY_MS);
+                Assert.IsFalse(t.IsAlive);
+            }
+            catch (Exception e)
+            {
+                UnexpectedException(e);
+            }
+        }
 
         [Test]
         public void TestHasWaitersNRE()
@@ -848,348 +886,456 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             }
         }
 
-//        [Test]
-//        public void TestHasWaiters()
-//        {
-//            Mutex sync = new Mutex();
-//            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
-//            Thread t = new Thread(new Runnable() {
-//                public void run() {
-//                    try {
-//                        sync.Acquire(1);
-//                        ThreadAssertFalse(sync.HasWaiters(c));
-//                        threadAssertEquals(0, sync.getWaitQueueLength(c));
-//                        c.Await();
-//                        sync.Release(1);
-//                    }
-//                    catch(ThreadInterruptedException)
-//                    {
-//                        ThreadUnexpectedException();
-//                    }
-//                }
-//            });
-//
-//            try
-//            {
-//                t.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                sync.Acquire(1);
-//                Assert.IsTrue(sync.HasWaiters(c));
-//                Assert.AreEqual(1, sync.getWaitQueueLength(c));
-//                c.Signal();
-//                sync.Release(1);
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                sync.Acquire(1);
-//                Assert.IsFalse(sync.HasWaiters(c));
-//                Assert.AreEqual(0, sync.getWaitQueueLength(c));
-//                sync.Release(1);
-//                t.Join(SHORT_DELAY_MS);
-//                Assert.IsFalse(t.isAlive());
-//            }
-//            catch (Exception)
-//            {
-//                UnexpectedException();
-//            }
-//        }
-//
-//        [Test]
-//        public void TestGetWaitQueueLength()
-//        {
-//            Mutex sync = new Mutex();
-//            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
-//            Thread t1 = new Thread(new Runnable() {
-//                public void run()
-//                {
-//                    try
-//                    {
-//                        sync.Acquire(1);
-//                        ThreadAssertFalse(sync.HasWaiters(c));
-//                        threadAssertEquals(0, sync.getWaitQueueLength(c));
-//                        c.Await();
-//                        sync.Release(1);
-//                    }
-//                    catch(ThreadInterruptedException)
-//                    {
-//                        ThreadUnexpectedException();
-//                    }
-//                }
-//         });
-//    
-//        Thread t2 = new Thread(new Runnable()
-//                                  {
-//         public void run() {
-//             try {
-//             sync.Acquire(1);
-//                            ThreadAssertTrue(sync.HasWaiters(c));
-//                            threadAssertEquals(1, sync.getWaitQueueLength(c));
-//                            c.Await();
-//                            sync.Release(1);
-//             }
-//             catch(ThreadInterruptedException) {
-//                            ThreadUnexpectedException();
-//                        }
-//         }
-//         });
-//
-//            try {
-//                t1.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                t2.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                sync.Acquire(1);
-//                Assert.IsTrue(sync.HasWaiters(c));
-//                Assert.AreEqual(2, sync.getWaitQueueLength(c));
-//                c.SignalAll();
-//                sync.Release(1);
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                sync.Acquire(1);
-//                Assert.IsFalse(sync.HasWaiters(c));
-//                Assert.AreEqual(0, sync.getWaitQueueLength(c));
-//                sync.Release(1);
-//                t1.Join(SHORT_DELAY_MS);
-//                t2.Join(SHORT_DELAY_MS);
-//                Assert.IsFalse(t1.isAlive());
-//                Assert.IsFalse(t2.isAlive());
-//            }
-//            catch (Exception) {
-//                UnexpectedException();
-//            }
-//        }
-//
-//        [Test]
-//        public void TestGetWaitingThreads()
-//        {
-//     Mutex sync = new Mutex();
-//            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
-//     Thread t1 = new Thread(new Runnable() {
-//         public void run() {
-//             try {
-//             sync.Acquire(1);
-//                            ThreadAssertTrue(sync.getWaitingThreads(c).IsEmpty());
-//                            c.Await();
-//                            sync.Release(1);
-//             }
-//             catch(ThreadInterruptedException) {
-//                            ThreadUnexpectedException();
-//                        }
-//         }
-//         });
-//    
-//     Thread t2 = new Thread(new Runnable() {
-//         public void run() {
-//             try {
-//             sync.Acquire(1);
-//                            ThreadAssertFalse(sync.getWaitingThreads(c).IsEmpty());
-//                            c.Await();
-//                            sync.Release(1);
-//             }
-//             catch(ThreadInterruptedException) {
-//                            ThreadUnexpectedException();
-//                        }
-//         }
-//         });
-//    
-//            try {
-//                sync.Acquire(1);
-//                Assert.IsTrue(sync.getWaitingThreads(c).IsEmpty());
-//                sync.Release(1);
-//                t1.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                t2.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                sync.Acquire(1);
-//                Assert.IsTrue(sync.HasWaiters(c));
-//                Assert.IsTrue(sync.getWaitingThreads(c).Contains(t1));
-//                Assert.IsTrue(sync.getWaitingThreads(c).Contains(t2));
-//                c.SignalAll();
-//                sync.Release(1);
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                sync.Acquire(1);
-//                Assert.IsFalse(sync.HasWaiters(c));
-//                Assert.IsTrue(sync.getWaitingThreads(c).IsEmpty());
-//                sync.Release(1);
-//                t1.Join(SHORT_DELAY_MS);
-//                t2.Join(SHORT_DELAY_MS);
-//                Assert.IsFalse(t1.isAlive());
-//                Assert.IsFalse(t2.isAlive());
-//            }
-//            catch (Exception) {
-//                UnexpectedException();
-//            }
-//        }
-//
-//        [Test]
-//        public void TestAwaitUnInterruptibly()
-//        {
-//     Mutex sync = new Mutex();
-//            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
-//     Thread t = new Thread(new Runnable() { 
-//         public void run() {
-//                        sync.Acquire(1);
-//                        c.AwaitUnInterruptibly();
-//                        sync.Release(1);
-//         }
-//         });
-//    
-//            try {
-//                t.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                t.Interrupt();
-//                sync.Acquire(1);
-//                c.Signal();
-//                sync.Release(1);
-//                t.Join(SHORT_DELAY_MS);
-//                Assert.IsFalse(t.isAlive());
-//            }
-//            catch (Exception) {
-//                UnexpectedException();
-//            }
-//        }
-//
-//        [Test]
-//        public void TestAwaitInterrupt()
-//        {
-//     Mutex sync = new Mutex();
-//            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
-//     Thread t = new Thread(new Runnable() {
-//         public void run() {
-//             try {
-//             sync.Acquire(1);
-//                            c.Await();
-//                            sync.Release(1);
-//                            threadShouldThrow();
-//             }
-//             catch(ThreadThreadInterruptedException) {
-//                        }
-//         }
-//         });
-//    
-//            try {
-//                t.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                t.Interrupt();
-//                t.Join(SHORT_DELAY_MS);
-//                Assert.IsFalse(t.isAlive());
-//            }
-//            catch (Exception) {
-//                UnexpectedException();
-//            }
-//        }
-//
-//        [Test]
-//        public void TestAwaitNanosInterrupt()
-//        {
-//     Mutex sync = new Mutex();
-//            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
-//     Thread t = new Thread(new Runnable() {
-//         public void run() {
-//             try {
-//             sync.Acquire(1);
-//                            c.AwaitNanos(1000 * 1000 * 1000); // 1 sec
-//                            sync.Release(1);
-//                            threadShouldThrow();
-//             }
-//             catch(ThreadThreadInterruptedException) {
-//                        }
-//         }
-//         });
-//    
-//            try {
-//                t.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                t.Interrupt();
-//                t.Join(SHORT_DELAY_MS);
-//                Assert.IsFalse(t.isAlive());
-//            }
-//            catch (Exception) {
-//                UnexpectedException();
-//            }
-//        }
-//
-//        [Test]
-//        public void TestAwaitUntilInterrupt()
-//        {
-//            Mutex sync = new Mutex();
-//            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
-//            Thread t = new Thread(new Runnable() {
-//         public void run() {
-//             try {
-//             sync.Acquire(1);
-//                            java.util.Date d = new java.util.Date();
-//                            c.AwaitUntil(new java.util.Date(d.getTime() + 10000));
-//                            sync.Release(1);
-//                            threadShouldThrow();
-//             }
-//             catch(ThreadThreadInterruptedException) {
-//                        }
-//         }
-//         });
-//    
-//            try {
-//                t.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                t.Interrupt();
-//                t.Join(SHORT_DELAY_MS);
-//                Assert.IsFalse(t.isAlive());
-//            }
-//            catch (Exception)
-//            {
-//                UnexpectedException();
-//            }
-//        }
-//
-//        [Test]
-//        public void TestSignalAll()
-//        {
-//            Mutex sync = new Mutex();
-//            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
-//            Thread t1 = new Thread(new Runnable() {
-//                public void run() {
-//                    try {
-//                        sync.Acquire(1);
-//                        c.Await();
-//                        sync.Release(1);
-//                    }
-//                    catch(ThreadInterruptedException)
-//                    {
-//                         ThreadUnexpectedException();
-//                    }
-//                }
-//            });
-//    
-//            Thread t2 = new Thread(new Runnable()
-//            {
-//                public void run()
-//                {
-//                    try {
-//                        sync.Acquire(1);
-//                            c.Await();
-//                            sync.Release(1);
-//             }
-//             catch(ThreadInterruptedException) {
-//                            ThreadUnexpectedException();
-//                        }
-//         }
-//         });
-//
-//            try
-//            {
-//                t1.Start();
-//                t2.Start();
-//                Thread.Sleep(SHORT_DELAY_MS);
-//                sync.Acquire(1);
-//                c.SignalAll();
-//                sync.Release(1);
-//                t1.Join(SHORT_DELAY_MS);
-//                t2.Join(SHORT_DELAY_MS);
-//                Assert.IsFalse(t1.isAlive());
-//                Assert.IsFalse(t2.isAlive());
-//            }
-//            catch (Exception)
-//            {
-//                UnexpectedException();
-//            }
-//        }
+        private class Pair
+        {
+            public readonly object first;
+            public readonly object second;
+
+            public Pair(object first, object second)
+            {
+                this.first = first;
+                this.second = second;
+            }
+        }
+
+        private void TestHasWaitersRunnable(Object state)
+        {
+            Pair data = state as Pair;
+            Mutex sync = data.first as Mutex;
+            AbstractQueuedSynchronizer.ConditionObject c = data.second as AbstractQueuedSynchronizer.ConditionObject;
+
+            try
+            {
+                sync.Acquire(1);
+                ThreadAssertFalse(sync.HasWaiters(c));
+                ThreadAssertEquals(0, sync.GetWaitQueueLength(c));
+                c.Await();
+                sync.Release(1);
+            }
+            catch(ThreadInterruptedException)
+            {
+                ThreadUnexpectedException();
+            }
+        }
+
+        [Test]
+        public void TestHasWaiters()
+        {
+            Mutex sync = new Mutex();
+            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
+            Pair data = new Pair(sync, c);
+            Thread t = new Thread(TestHasWaitersRunnable);
+
+            try
+            {
+                t.Start(data);
+                Thread.Sleep(SHORT_DELAY_MS);
+                sync.Acquire(1);
+                Assert.IsTrue(sync.HasWaiters(c));
+                Assert.AreEqual(1, sync.GetWaitQueueLength(c));
+                c.Signal();
+                sync.Release(1);
+                Thread.Sleep(SHORT_DELAY_MS);
+                sync.Acquire(1);
+                Assert.IsFalse(sync.HasWaiters(c));
+                Assert.AreEqual(0, sync.GetWaitQueueLength(c));
+                sync.Release(1);
+                t.Join(SHORT_DELAY_MS);
+                Assert.IsFalse(t.IsAlive);
+            }
+            catch (Exception)
+            {
+                UnexpectedException();
+            }
+        }
+
+        private void TestGetWaitQueueLengthRunnable1(object state)
+        {
+            Pair data = state as Pair;
+            Mutex sync = data.first as Mutex;
+            AbstractQueuedSynchronizer.ConditionObject c = data.second as AbstractQueuedSynchronizer.ConditionObject;
+
+            try
+            {
+                sync.Acquire(1);
+                ThreadAssertFalse(sync.HasWaiters(c));
+                ThreadAssertEquals(0, sync.GetWaitQueueLength(c));
+                c.Await();
+                sync.Release(1);
+            }
+            catch(ThreadInterruptedException e)
+            {
+                ThreadUnexpectedException(e);
+            }
+        }
+
+        private void TestGetWaitQueueLengthRunnable2(object state)
+        {
+            Pair data = state as Pair;
+            Mutex sync = data.first as Mutex;
+            AbstractQueuedSynchronizer.ConditionObject c = data.second as AbstractQueuedSynchronizer.ConditionObject;
+
+            try
+            {
+                sync.Acquire(1);
+                ThreadAssertTrue(sync.HasWaiters(c));
+                ThreadAssertEquals(1, sync.GetWaitQueueLength(c));
+                c.Await();
+                sync.Release(1);
+            }
+            catch(ThreadInterruptedException e)
+            {
+                ThreadUnexpectedException(e);
+            }
+        }
+
+        [Test]
+        public void TestGetWaitQueueLength()
+        {
+            Mutex sync = new Mutex();
+            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
+            Pair data = new Pair(sync, c);
+
+            Thread t1 = new Thread(TestGetWaitQueueLengthRunnable1);
+            Thread t2 = new Thread(TestGetWaitQueueLengthRunnable2);
+
+            try
+            {
+                t1.Start(data);
+                Thread.Sleep(SHORT_DELAY_MS);
+                t2.Start(data);
+                Thread.Sleep(SHORT_DELAY_MS);
+                sync.Acquire(1);
+                Assert.IsTrue(sync.HasWaiters(c));
+                Assert.AreEqual(2, sync.GetWaitQueueLength(c));
+                c.SignalAll();
+                sync.Release(1);
+                Thread.Sleep(SHORT_DELAY_MS);
+                sync.Acquire(1);
+                Assert.IsFalse(sync.HasWaiters(c));
+                Assert.AreEqual(0, sync.GetWaitQueueLength(c));
+                sync.Release(1);
+                t1.Join(SHORT_DELAY_MS);
+                t2.Join(SHORT_DELAY_MS);
+                Assert.IsFalse(t1.IsAlive);
+                Assert.IsFalse(t2.IsAlive);
+            }
+            catch (Exception e)
+            {
+                UnexpectedException(e);
+            }
+        }
+
+        private void TestGetWaitingThreadsRunnable1(object state)
+        {
+            Pair data = state as Pair;
+            Mutex sync = data.first as Mutex;
+            AbstractQueuedSynchronizer.ConditionObject c =
+                data.second as AbstractQueuedSynchronizer.ConditionObject;
+
+            try
+            {
+                sync.Acquire(1);
+                ThreadAssertTrue(sync.GetWaitingThreads(c).IsEmpty());
+                c.Await();
+                sync.Release(1);
+            }
+            catch(ThreadInterruptedException)
+            {
+                ThreadUnexpectedException();
+            }
+        }
+
+        private void TestGetWaitingThreadsRunnable2(object state)
+        {
+            Pair data = state as Pair;
+            Mutex sync = data.first as Mutex;
+            AbstractQueuedSynchronizer.ConditionObject c =
+                data.second as AbstractQueuedSynchronizer.ConditionObject;
+
+            try
+            {
+                sync.Acquire(1);
+                ThreadAssertFalse(sync.GetWaitingThreads(c).IsEmpty());
+                c.Await();
+                sync.Release(1);
+            }
+            catch(ThreadInterruptedException e)
+            {
+                ThreadUnexpectedException(e);
+            }
+        }
+
+        [Test]
+        public void TestGetWaitingThreads()
+        {
+            Mutex sync = new Mutex();
+            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
+            Pair data = new Pair(sync, c);
+
+            Thread t1 = new Thread(TestGetWaitingThreadsRunnable1);
+            Thread t2 = new Thread(TestGetWaitingThreadsRunnable2);
+
+            try
+            {
+                sync.Acquire(1);
+                Assert.IsTrue(sync.GetWaitingThreads(c).IsEmpty());
+                sync.Release(1);
+                t1.Start(data);
+                Thread.Sleep(SHORT_DELAY_MS);
+                t2.Start(data);
+                Thread.Sleep(SHORT_DELAY_MS);
+                sync.Acquire(1);
+                Assert.IsTrue(sync.HasWaiters(c));
+                Assert.IsTrue(sync.GetWaitingThreads(c).Contains(t1));
+                Assert.IsTrue(sync.GetWaitingThreads(c).Contains(t2));
+                c.SignalAll();
+                sync.Release(1);
+                Thread.Sleep(SHORT_DELAY_MS);
+                sync.Acquire(1);
+                Assert.IsFalse(sync.HasWaiters(c));
+                Assert.IsTrue(sync.GetWaitingThreads(c).IsEmpty());
+                sync.Release(1);
+                t1.Join(SHORT_DELAY_MS);
+                t2.Join(SHORT_DELAY_MS);
+                Assert.IsFalse(t1.IsAlive);
+                Assert.IsFalse(t2.IsAlive);
+            }
+            catch (Exception e)
+            {
+                UnexpectedException(e);
+            }
+        }
+
+        private void TestAwaitUnInterruptiblyRunnable(object state)
+        {
+            Pair data = state as Pair;
+            Mutex sync = data.first as Mutex;
+            AbstractQueuedSynchronizer.ConditionObject c =
+                data.second as AbstractQueuedSynchronizer.ConditionObject;
+
+            sync.Acquire(1);
+            c.AwaitUnInterruptibly();
+            sync.Release(1);
+        }
+
+        [Test]
+        public void TestAwaitUnInterruptibly()
+        {
+            Mutex sync = new Mutex();
+            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
+            Pair data = new Pair(sync, c);
+
+            Thread t = new Thread(TestAwaitUnInterruptiblyRunnable);
+    
+            try
+            {
+                t.Start(data);
+                Thread.Sleep(SHORT_DELAY_MS);
+                t.Interrupt();
+                sync.Acquire(1);
+                c.Signal();
+                sync.Release(1);
+                t.Join(SHORT_DELAY_MS);
+                Assert.IsFalse(t.IsAlive);
+            }
+            catch (Exception e)
+            {
+                UnexpectedException(e);
+            }
+        }
+
+        private void TestAwaitInterruptRunnable(object state)
+        {
+            Pair data = state as Pair;
+            Mutex sync = data.first as Mutex;
+            AbstractQueuedSynchronizer.ConditionObject c =
+                data.second as AbstractQueuedSynchronizer.ConditionObject;
+
+            try
+            {
+                sync.Acquire(1);
+                c.Await();
+                sync.Release(1);
+                ThreadShouldThrow();
+            }
+            catch(ThreadInterruptedException)
+            {
+            }
+        }
+
+        [Test]
+        public void TestAwaitInterrupt()
+        {
+            Mutex sync = new Mutex();
+            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
+            Pair data = new Pair(sync, c);
+            Thread t = new Thread(TestAwaitInterruptRunnable);
+
+            try
+            {
+                t.Start(data);
+                Thread.Sleep(SHORT_DELAY_MS);
+                t.Interrupt();
+                t.Join(SHORT_DELAY_MS);
+                Assert.IsFalse(t.IsAlive);
+            }
+            catch (Exception e)
+            {
+                UnexpectedException(e);
+            }
+        }
+
+        private void TestAwaitTimedInterruptRunnable(object state)
+        {
+            Pair data = state as Pair;
+            Mutex sync = data.first as Mutex;
+            AbstractQueuedSynchronizer.ConditionObject c =
+                data.second as AbstractQueuedSynchronizer.ConditionObject;
+
+            try
+            {
+                sync.Acquire(1);
+                c.Await(1000); // 1 sec
+                sync.Release(1);
+                ThreadShouldThrow();
+            }
+            catch(ThreadInterruptedException)
+            {
+            }
+        }
+
+        [Test]
+        public void TestAwaitTimedInterrupt()
+        {
+            Mutex sync = new Mutex();
+            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
+            Pair data = new Pair(sync, c);
+
+            Thread t = new Thread(TestAwaitTimedInterruptRunnable);
+
+            try
+            {
+                t.Start(data);
+                Thread.Sleep(SHORT_DELAY_MS);
+                t.Interrupt();
+                t.Join(SHORT_DELAY_MS);
+                Assert.IsFalse(t.IsAlive);
+            }
+            catch (Exception e)
+            {
+                UnexpectedException(e);
+            }
+        }
+
+        private void TestAwaitUntilInterruptRunnable(object state)
+        {
+            Pair data = state as Pair;
+            Mutex sync = data.first as Mutex;
+            AbstractQueuedSynchronizer.ConditionObject c =
+                data.second as AbstractQueuedSynchronizer.ConditionObject;
+
+            try
+            {
+                sync.Acquire(1);
+                c.AwaitUntil(DateTime.Now.AddMilliseconds(10000));
+                sync.Release(1);
+                ThreadShouldThrow();
+            }
+            catch(ThreadInterruptedException)
+            {
+            }
+        }
+
+        [Test]
+        public void TestAwaitUntilInterrupt()
+        {
+            Mutex sync = new Mutex();
+            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
+            Pair data = new Pair(sync, c);
+
+            Thread t = new Thread(TestAwaitUntilInterruptRunnable);
+    
+            try
+            {
+                t.Start(data);
+                Thread.Sleep(SHORT_DELAY_MS);
+                t.Interrupt();
+                t.Join(SHORT_DELAY_MS);
+                Assert.IsFalse(t.IsAlive);
+            }
+            catch (Exception e)
+            {
+                UnexpectedException(e);
+            }
+        }
+
+        private void TestSignalAllRunnable1(object state)
+        {
+            Pair data = state as Pair;
+            Mutex sync = data.first as Mutex;
+            AbstractQueuedSynchronizer.ConditionObject c =
+                data.second as AbstractQueuedSynchronizer.ConditionObject;
+
+            try
+            {
+                sync.Acquire(1);
+                c.Await();
+                sync.Release(1);
+            }
+            catch(ThreadInterruptedException e)
+            {
+                ThreadUnexpectedException(e);
+            }
+        }
+
+        private void TestSignalAllRunnable2(object state)
+        {
+            Pair data = state as Pair;
+            Mutex sync = data.first as Mutex;
+            AbstractQueuedSynchronizer.ConditionObject c =
+                data.second as AbstractQueuedSynchronizer.ConditionObject;
+
+            try
+            {
+                sync.Acquire(1);
+                c.Await();
+                sync.Release(1);
+            }
+            catch(ThreadInterruptedException e)
+            {
+                ThreadUnexpectedException(e);
+            }
+        }
+
+        [Test]
+        public void TestSignalAll()
+        {
+            Mutex sync = new Mutex();
+            AbstractQueuedSynchronizer.ConditionObject c = sync.NewCondition();
+            Pair data = new Pair(sync, c);
+
+            Thread t1 = new Thread(TestSignalAllRunnable1);
+            Thread t2 = new Thread(TestSignalAllRunnable2);
+
+            try
+            {
+                t1.Start(data);
+                t2.Start(data);
+                Thread.Sleep(SHORT_DELAY_MS);
+                sync.Acquire(1);
+                c.SignalAll();
+                sync.Release(1);
+                t1.Join(SHORT_DELAY_MS);
+                t2.Join(SHORT_DELAY_MS);
+                Assert.IsFalse(t1.IsAlive);
+                Assert.IsFalse(t2.IsAlive);
+            }
+            catch (Exception e)
+            {
+                UnexpectedException(e);
+            }
+        }
 
         [Test]
         public void TestToString()
@@ -1297,45 +1443,45 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             }
         }
 
-//        private void TestAcquireSharedInterruptiblyInterruptedExceptionRannable(Object state)
-//        {
-//            BooleanLatch l = state as BooleanLatch;
-//
-//            try
-//            {
-//                ThreadAssertFalse(l.IsSignalled());
-//                ThreadAssertTrue(l.AcquireSharedInterruptibly(0));
-//                ThreadAssertTrue(l.IsSignalled());
-//            }
-//            catch(ThreadInterruptedException)
-//            {
-//            }
-//            catch(Exception e)
-//            {
-//                ThreadUnexpectedException(e);
-//            }
-//        }
-//
-//        [Test]
-//        public void TestAcquireSharedInterruptiblyInterruptedException()
-//        {
-//            BooleanLatch l = new BooleanLatch();
-//
-//            Thread t = new Thread(TestAcquireSharedInterruptiblyInterruptedExceptionRannable);
-//
-//            t.Start(l);
-//
-//            try
-//            {
-//                Assert.IsFalse(l.IsSignalled());
-//                t.Interrupt();
-//                t.Join();
-//            }
-//            catch (ThreadInterruptedException)
-//            {
-//                UnexpectedException();
-//            }
-//        }
+        private void TestAcquireSharedInterruptiblyInterruptedExceptionRannable(Object state)
+        {
+            BooleanLatch l = state as BooleanLatch;
+
+            try
+            {
+                ThreadAssertFalse(l.IsSignalled());
+                l.AcquireSharedInterruptibly(0);
+                ThreadAssertTrue(l.IsSignalled());
+            }
+            catch(ThreadInterruptedException)
+            {
+            }
+            catch(Exception e)
+            {
+                ThreadUnexpectedException(e);
+            }
+        }
+
+        [Test]
+        public void TestAcquireSharedInterruptiblyInterruptedException()
+        {
+            BooleanLatch l = new BooleanLatch();
+
+            Thread t = new Thread(TestAcquireSharedInterruptiblyInterruptedExceptionRannable);
+
+            t.Start(l);
+
+            try
+            {
+                Assert.IsFalse(l.IsSignalled());
+                t.Interrupt();
+                t.Join();
+            }
+            catch (ThreadInterruptedException)
+            {
+                UnexpectedException();
+            }
+        }
 
         private void TestAcquireSharedTimedInterruptedExceptionRannable(Object state)
         {

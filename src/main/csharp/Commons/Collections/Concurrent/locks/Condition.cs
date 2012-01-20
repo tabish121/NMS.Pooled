@@ -23,7 +23,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
     {
         void Await();
 
-        void AwaitUninterruptibly();
+        void AwaitUnInterruptibly();
 
         int Await(int timeout);
 

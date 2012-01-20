@@ -1040,16 +1040,13 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             return TryAcquire(arg) || DoAcquireTimed(arg, timeout);
         }
 
-        /**
-         * Releases in exclusive mode.  Implemented by unblocking one or
-         * more threads if {@link #tryRelease} returns true.
-         * This method can be used to implement method {@link Lock#unlock}.
-         *
-         * @param arg the release argument.  This value is conveyed to
-         *        {@link #tryRelease} but is otherwise uninterpreted and
-         *        can represent anything you like.
-         * @return the value returned from {@link #tryRelease}
-         */
+        /// <summary>
+        /// Releases in exclusive mode.  Implemented by unblocking one or more
+        /// threads if TryRelease returns true.  This method can be used to implement
+        /// method Lock.UnLock().  Returns the value returned from TryRelease.  The
+        /// value passed to this method is passed into the call to TryRelease but
+        /// is otherwise not interpreted and can represent anything.
+        /// </summary>
         public bool Release(int arg)
         {
             if (TryRelease(arg))
@@ -1887,7 +1884,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
              *      {@link #acquire} with saved state as argument.
              * </ol>
              */
-            public void AwaitUninterruptibly()
+            public void AwaitUnInterruptibly()
             {
                 Node node = AddConditionWaiter();
                 int savedState = parent.FullyRelease(node);
