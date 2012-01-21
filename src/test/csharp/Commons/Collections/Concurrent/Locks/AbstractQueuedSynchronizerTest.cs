@@ -459,7 +459,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             {
                 UnexpectedException(e);
             }
-        } 
+        }
 
         private void TestAcquireTimedTimeoutRunnable(object state)
         {
@@ -492,7 +492,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             {
                 UnexpectedException(e);
             }
-        } 
+        }
 
         private void TestGetStateRunnable(object state)
         {
@@ -554,7 +554,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             {
                 UnexpectedException(e);
             }
-        } 
+        }
 
         [Test]
         public void TestAcquireInterruptibly2()
@@ -1127,7 +1127,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             Pair data = new Pair(sync, c);
 
             Thread t = new Thread(TestAwaitUnInterruptiblyRunnable);
-    
+
             try
             {
                 t.Start(data);

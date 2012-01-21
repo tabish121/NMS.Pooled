@@ -106,37 +106,35 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
              */
             public volatile Node prev;
     
-            /**
-             * Link to the successor node that the current node/thread
-             * unparks upon release. Assigned during enqueuing, adjusted
-             * when bypassing cancelled predecessors, and nulled out (for
-             * sake of GC) when dequeued.  The enq operation does not
-             * assign next field of a predecessor until after attachment,
-             * so seeing a null next field does not necessarily mean that
-             * node is at end of queue. However, if a next field appears
-             * to be null, we can scan prev's from the tail to
-             * double-check.  The next field of cancelled nodes is set to
-             * point to the node itself instead of null, to make life
-             * easier for isOnSyncQueue.
-             */
+            /// <summary>
+            /// Link to the successor node that the current node/thread unparks
+            /// upon release. Assigned during enqueuing, adjusted when bypassing
+            /// cancelled predecessors, and nulled out (for sake of GC) when
+            /// dequeued.  The Enq operation does not assign next field of a
+            /// predecessor until after attachment, so seeing a null next field
+            /// does not necessarily mean that node is at end of queue. However,
+            /// if a next field appears to be null, we can scan prev's from the
+            /// tail to double-check.  The next field of cancelled nodes is set
+            /// to point to the node itself instead of null, to make life easier
+            /// for IsOnSyncQueue.
+            /// </summary>
             public volatile Node next;
     
-            /**
-             * The thread that enqueued this node.  Initialized on
-             * construction and nulled out after use.
-             */
+            /// <summary>
+            /// The thread that enqueued this node.  Initialized on construction
+            /// and nulled out after use.
+            /// </summary>
             public volatile Thread thread;
     
-            /**
-             * Link to next node waiting on condition, or the special
-             * value SHARED.  Because condition queues are accessed only
-             * when holding in exclusive mode, we just need a simple
-             * linked queue to hold nodes while they are waiting on
-             * conditions. They are then transferred to the queue to
-             * re-acquire. And because conditions can only be exclusive,
-             * we save a field by using special value to indicate shared
-             * mode.
-             */
+            /// <summary>
+            /// Link to next node waiting on condition, or the special value
+            /// SHARED.  Because condition queues are accessed only when holding
+            /// in exclusive mode, we just need a simple linked queue to hold
+            /// nodes while they are waiting on conditions. They are then
+            /// transferred to the queue to re-acquire. And because conditions
+            /// can only be exclusive, we save a field by using special
+            /// value to indicate shared mode.
+            /// </summary>
             public Node nextWaiter;
     
             /// <summary>
@@ -197,10 +195,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         // The synchronization state.
         private volatile int state;
 
-        // The number of nanoseconds for which it is faster to spin rather than to
-        // use timed park. A rough estimate suffices to improve responsiveness with
-        // very short timeouts.
-        private const long spinForTimeoutThreshold = 1000L;
+        // The number of milliseconds for which it is faster to spin rather than
+        // to use timed park. A rough estimate suffices to improve responsiveness
+        // with very short timeouts.
+        private const int spinForTimeoutThreshold = 1;
 
         #endregion
 
@@ -2156,14 +2154,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 return ReferenceEquals(sync, parent);
             }
     
-            /**
-             * Queries whether any threads are waiting on this condition.
-             * Implements {@link AbstractQueuedSynchronizer#hasWaiters}.
-             *
-             * @return {@code true} if there are any waiting threads
-             * @throws ThreadStateException if {@link #IsHeldExclusively}
-             *         returns {@code false}
-             */
+            /// <summary>
+            /// Queries whether any threads are waiting on this condition.
+            /// </summary>
             internal bool HasWaiters
             {
                 get
@@ -2184,15 +2177,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 }
             }
 
-            /**
-             * Returns an estimate of the number of threads waiting on
-             * this condition.
-             * Implements {@link AbstractQueuedSynchronizer#getWaitQueueLength}.
-             *
-             * @return the estimated number of waiting threads
-             * @throws ThreadStateException if {@link #IsHeldExclusively}
-             *         returns {@code false}
-             */
+            /// <summary>
+            /// Returns an estimate of the number of threads waiting on this condition.
+            /// </summary>
             internal int WaitQueueLength
             {
                 get
@@ -2213,15 +2200,11 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 }
             }
 
-            /**
-             * Returns a collection containing those threads that may be
-             * waiting on this Condition.
-             * Implements {@link AbstractQueuedSynchronizer#getWaitingThreads}.
-             *
-             * @return the collection of threads
-             * @throws ThreadStateException if {@link #IsHeldExclusively}
-             *         returns {@code false}
-             */
+            /// <summary>
+            /// Returns a collection containing those threads that may be waiting on this
+            /// Condition.  Will throw a ThreadStateException if the parent in not being
+            /// held by the caller.
+            /// </summary>
             internal Collection<Thread> WaitingThreads
             {
                 get

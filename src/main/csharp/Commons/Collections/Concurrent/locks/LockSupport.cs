@@ -36,6 +36,15 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         private static readonly Object mutex = new Object();
 
         /// <summary>
+        /// An always set event that is used to check if the current thread has been interrupted
+        /// by some other Thread.  This is used only if the stored Thread local boolean isn't
+        /// set meaning that the thread wasn't in a Park operation but we still want to check
+        /// if its been interrupted from some other wait, or before performing something that
+        /// we know is going to cause it to block.
+        /// </summary>
+        private static readonly ManualResetEvent interuptGate = new ManualResetEvent(true);
+
+        /// <summary>
         /// Disables the current thread for thread scheduling purposes unless the
         /// permit is available.  If the permit is available then it is consumed and
         /// the call returns immediately; otherwise the current thread becomes disabled
@@ -187,6 +196,18 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                     interrupted = true;
                 }
                 Thread.SetData(slot, null);
+            }
+
+            if (!interrupted)
+            {
+                try
+                {
+                    interuptGate.WaitOne();
+                }
+                catch(ThreadInterruptedException)
+                {
+                    return true;
+                }
             }
 
             return interrupted;
