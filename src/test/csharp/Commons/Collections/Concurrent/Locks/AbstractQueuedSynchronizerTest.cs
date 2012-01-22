@@ -886,18 +886,6 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             }
         }
 
-        private class Pair
-        {
-            public readonly object first;
-            public readonly object second;
-
-            public Pair(object first, object second)
-            {
-                this.first = first;
-                this.second = second;
-            }
-        }
-
         private void TestHasWaitersRunnable(Object state)
         {
             Pair data = state as Pair;

@@ -65,7 +65,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         /// allowed to unlock the Lock object however this behavior can be
         /// implementation specific.
         /// </summary>
-        void Unlock();
+        void UnLock();
 
         /// <summary>
         /// Returns a new Condition instance that is bound to this Lock instance.

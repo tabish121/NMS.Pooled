@@ -81,6 +81,7 @@
     <Compile Include="src\test\csharp\Commons\Collections\Concurrent\CopyOnWriteArraySetTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\Concurrent\Locks\AbstractQueuedSynchronizerTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\Concurrent\Locks\LockSupportTest.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\Concurrent\Locks\ReentrantLockTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vs2008-pooled.csproj">

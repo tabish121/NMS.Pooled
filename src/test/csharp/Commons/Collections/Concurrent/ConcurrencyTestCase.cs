@@ -54,6 +54,18 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
         public static int MEDIUM_DELAY_MS;
         public static int LONG_DELAY_MS;
 
+        protected class Pair
+        {
+            public readonly object first;
+            public readonly object second;
+
+            public Pair(object first, object second)
+            {
+                this.first = first;
+                this.second = second;
+            }
+        }
+
         protected virtual int GetShortDelay()
         {
             return 100;

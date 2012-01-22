@@ -105,6 +105,7 @@
     <Compile Include="src\main\csharp\Commons\Collections\Concurrent\locks\Lock.cs" />
     <Compile Include="src\main\csharp\Commons\Collections\Concurrent\CopyOnWriteArrayList.cs" />
     <Compile Include="src\main\csharp\Commons\Collections\Concurrent\CopyOnWriteArraySet.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Concurrent\locks\ReentrantLock.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\main\csharp\Util\" />
