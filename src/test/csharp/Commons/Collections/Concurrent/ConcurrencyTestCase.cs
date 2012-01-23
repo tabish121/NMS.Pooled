@@ -20,6 +20,7 @@ using NUnit.Framework;
 
 namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
 {
+    [TestFixture]
     public class ConcurrencyTestCase
     {
         /**
@@ -79,12 +80,14 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             LONG_DELAY_MS = SHORT_DELAY_MS * 50;
         }
 
+        [SetUp]
         public virtual void SetUp()
         {
             SetDelays();
             threadFailed = false;
         }
 
+        [TearDown]
         public virtual void TearDown()
         {
             Assert.IsFalse(threadFailed, "A thread failed: " + threadFailedMessage);

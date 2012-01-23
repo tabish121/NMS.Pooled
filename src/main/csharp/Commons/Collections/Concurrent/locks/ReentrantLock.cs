@@ -230,7 +230,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 
         public bool TryLock()
         {
-            return false;
+            return sync.NonfairTryAcquire(1);
         }
 
         public bool TryLock(long millisecs)

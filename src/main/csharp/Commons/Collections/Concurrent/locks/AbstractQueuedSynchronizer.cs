@@ -2077,7 +2077,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                     ReportInterruptAfterWait(interruptMode);
                 }
 
-                return (int)(originalTimeout - timeout).TotalMilliseconds;
+                return (int)(deadline - DateTime.Now).TotalMilliseconds;
             }
     
             /**

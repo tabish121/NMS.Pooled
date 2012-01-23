@@ -531,7 +531,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         }
 
         [Test]
-        public void TestAwaitNanosTimeout()
+        public void TestAwaitWithTimeout()
         {
             ReentrantLock locker = new ReentrantLock();
             Condition c = locker.NewCondition();
@@ -611,11 +611,11 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             try
             {
                 t.Start(data);
-                Thread.Sleep(SHORT_DELAY_MS);
+                Thread.Sleep(MEDIUM_DELAY_MS);
                 locker.Lock();
                 c.Signal();
                 locker.UnLock();
-                t.Join(SHORT_DELAY_MS);
+                t.Join(SMALL_DELAY_MS);
                 Assert.IsFalse(t.IsAlive);
             }
             catch (Exception e)
@@ -1094,7 +1094,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             try
             {
                 t.Start(data);
-                Thread.Sleep(SHORT_DELAY_MS);
+                Thread.Sleep(MEDIUM_DELAY_MS);
                 t.Interrupt();
                 t.Join(SHORT_DELAY_MS);
                 Assert.IsFalse(t.IsAlive);
