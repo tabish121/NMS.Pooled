@@ -76,7 +76,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 return false;
             }
     
-            protected override bool TryRelease(int releases)
+            protected internal override bool TryRelease(int releases)
             {
                 int c = State - releases;
                 if (Thread.CurrentThread != ExclusiveOwnerThread)
@@ -95,7 +95,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 return free;
             }
     
-            protected override bool IsHeldExclusively()
+            protected internal override bool IsHeldExclusively()
             {
                 // While we must in general read state before owner,
                 // we don't need to do so to check if current thread is owner
@@ -147,7 +147,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 }
             }
 
-            protected override bool TryAcquire(int acquires)
+            protected internal override bool TryAcquire(int acquires)
             {
                 return NonfairTryAcquire(acquires);
             }
@@ -164,7 +164,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             /// Fair version of tryAcquire.  Don't grant access unless recursive call
             /// or no waiters or is first.
             /// </summary>
-            protected override bool TryAcquire(int acquires)
+            protected internal override bool TryAcquire(int acquires)
             {
                 Thread current = Thread.CurrentThread;
                 int c = State;

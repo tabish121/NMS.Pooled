@@ -846,7 +846,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
          *         correctly.
          * @throws UnsupportedOperationException if exclusive mode is not supported
          */
-        protected virtual bool TryAcquire(int arg)
+        protected internal virtual bool TryAcquire(int arg)
         {
             throw new NotSupportedException();
         }
@@ -873,7 +873,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
          *         correctly.
          * @throws UnsupportedOperationException if exclusive mode is not supported
          */
-        protected virtual bool TryRelease(int arg)
+        protected internal virtual bool TryRelease(int arg)
         {
             throw new NotSupportedException();
         }
@@ -910,7 +910,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
          *         correctly.
          * @throws UnsupportedOperationException if shared mode is not supported
          */
-        protected virtual int TryAcquireShared(int arg)
+        protected internal virtual int TryAcquireShared(int arg)
         {
             throw new NotSupportedException();
         }
@@ -936,7 +936,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
          *         correctly.
          * @throws UnsupportedOperationException if shared mode is not supported
          */
-        protected virtual bool TryReleaseShared(int arg)
+        protected internal virtual bool TryReleaseShared(int arg)
         {
             throw new NotSupportedException();
         }
@@ -949,7 +949,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         /// invoked internally only within ConditionObject methods, so need not be
         /// defined if conditions are not used.
         /// </summary>
-        protected virtual bool IsHeldExclusively()
+        protected internal virtual bool IsHeldExclusively()
         {
             throw new NotSupportedException();
         }

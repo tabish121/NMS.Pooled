@@ -9,6 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>vs2008pooledtest</RootNamespace>
     <AssemblyName>vs2008-pooled-test</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,10 +31,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Apache.NMS">
+    <Reference Include="Apache.NMS, Version=1.6.0.2584, Culture=neutral, PublicKeyToken=82756feee3957618">
       <HintPath>lib\Apache.NMS\mono-2.0\Apache.NMS.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework">
+    <Reference Include="nunit.framework, Version=2.5.8.10295, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
       <HintPath>lib\NUnit\mono-2.0\nunit.framework.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -82,6 +83,7 @@
     <Compile Include="src\test\csharp\Commons\Collections\Concurrent\Locks\AbstractQueuedSynchronizerTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\Concurrent\Locks\LockSupportTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\Concurrent\Locks\ReentrantLockTest.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\Concurrent\Locks\ReentrantReadWriteLockTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vs2008-pooled.csproj">
