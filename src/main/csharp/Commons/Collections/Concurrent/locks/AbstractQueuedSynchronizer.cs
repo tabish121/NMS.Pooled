@@ -2025,7 +2025,6 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                     throw new ThreadInterruptedException();
                 }
 
-                TimeSpan originalTimeout = timeout;
                 Node node = AddConditionWaiter();
                 int savedState = parent.FullyRelease(node);
 

@@ -1713,7 +1713,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             }
         }
 
-        private void TestGetWaitingThreadsRun(object state)
+        private void TestGetWaitingThreadsRun1(object state)
         {
             Pair data = state as Pair;
             PublicReentrantReadWriteLock locker = data.first as PublicReentrantReadWriteLock;
@@ -1732,14 +1732,33 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             }
         }
 
+        private void TestGetWaitingThreadsRun2(object state)
+        {
+            Pair data = state as Pair;
+            PublicReentrantReadWriteLock locker = data.first as PublicReentrantReadWriteLock;
+            Condition c = data.second as Condition;
+
+            try
+            {
+                locker.WriteLock.Lock();
+                ThreadAssertFalse(locker.AccessGetWaitingThreads(c).IsEmpty());
+                c.Await();
+                locker.WriteLock.UnLock();
+            }
+            catch(ThreadInterruptedException e)
+            {
+                ThreadUnexpectedException(e);
+            }
+        }
+
         [Test]
         public void TestGetWaitingThreads()
         {
             PublicReentrantReadWriteLock locker = new PublicReentrantReadWriteLock();
             Condition c = locker.WriteLock.NewCondition();
             Pair data = new Pair(locker, c);
-            Thread t1 = new Thread(TestGetWaitingThreadsRun);
-            Thread t2 = new Thread(TestGetWaitingThreadsRun);
+            Thread t1 = new Thread(TestGetWaitingThreadsRun1);
+            Thread t2 = new Thread(TestGetWaitingThreadsRun2);
     
             try
             {
