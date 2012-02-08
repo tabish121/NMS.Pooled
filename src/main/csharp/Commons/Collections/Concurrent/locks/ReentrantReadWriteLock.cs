@@ -18,6 +18,8 @@
 using System;
 using System.Threading;
 
+using Apache.NMS.Pooled.Commons.Lang;
+
 namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 {
     public class ReentrantReadWriteLock : ReadWriteLock

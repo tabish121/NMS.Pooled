@@ -52,6 +52,7 @@
     <Folder Include="src\test\csharp\Commons\Pool\" />
     <Folder Include="src\test\csharp\Commons\Pool\Impl\" />
     <Folder Include="src\test\csharp\Commons\Collections\Concurrent\Locks\" />
+    <Folder Include="src\test\csharp\Commons\Collections\Lang\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\test\csharp\MessageProducerTest.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="src\test\csharp\Commons\Collections\Concurrent\Locks\LockSupportTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\Concurrent\Locks\ReentrantLockTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\Concurrent\Locks\ReentrantReadWriteLockTest.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\Lang\ThreadLocalTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vs2008-pooled.csproj">

@@ -18,7 +18,7 @@
 using System;
 using System.Threading;
 
-namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
+namespace Apache.NMS.Pooled.Commons.Lang
 {
     public class ThreadLocal<T> where T : class
     {
