@@ -113,11 +113,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 }
             }
     
-            /*
-             * The number of reentrant read locks held by current thread.
-             * Initialized only in constructor and readObject.
-             * Removed whenever a thread's read hold count drops to 0.
-             */
+            /// <summary>
+            /// The number of reentrant read locks held by current thread.  Initialized
+            /// only in constructor Removed whenever a thread's read hold count drops to 0.
+            /// </summary>
             private ThreadLocalHoldCounter readHolds;
     
             /*
@@ -439,11 +438,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 }
             }
     
-            /**
-             * Performs TryLock for write, enabling barging in both modes.
-             * This is identical in effect to tryAcquire except for lack
-             * of calls to writerShouldBlock.
-             */
+            /// <summary>
+            /// Performs TryLock for write, enabling barging in both modes.  This is identical
+            /// in effect to tryAcquire except for lack of calls to writerShouldBlock.
+            /// </summary>
             public bool TryWriteLock()
             {
                 Thread current = Thread.CurrentThread;
@@ -1154,7 +1152,6 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
              *
              * @return {@code true} if the current thread holds this lock and
              *         {@code false} otherwise
-             * @since 1.6
              */
             public bool IsHeldByCurrentThread()
             {
@@ -1169,7 +1166,6 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
              *
              * @return the number of holds on this lock by the current thread,
              *         or zero if this lock is not held by the current thread
-             * @since 1.6
              */
             public int HoldCount
             {
@@ -1455,15 +1451,15 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             return sync.GetWaitingThreads((AbstractQueuedSynchronizer.ConditionObject)condition);
         }
     
-        /**
-         * Returns a string identifying this lock, as well as its lock state.
-         * The state, in brackets, includes the String {@code "Write locks ="}
-         * followed by the number of reentrantly held write locks, and the
-         * String {@code "Read locks ="} followed by the number of held
-         * read locks.
-         *
-         * @return a string identifying this lock, as well as its lock state
-         */
+        /// <summary>
+        /// Returns a string identifying this lock, as well as its lock state.
+        /// The state, in brackets, includes the String "Write locks =" followed
+        /// by the number of reentrantly held write locks, and the String
+        /// "Read locks =" followed by the number of held read locks.
+        /// </summary>
+        /// <returns>
+        /// A string identifying this lock, as well as its lock state
+        /// </returns>
         public override String ToString()
         {
             int c = sync.Count;

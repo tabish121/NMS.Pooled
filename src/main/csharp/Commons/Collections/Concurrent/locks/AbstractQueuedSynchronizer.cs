@@ -1661,22 +1661,28 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             return condition.HasWaiters;
         }
     
-        /**
-         * Returns an estimate of the number of threads waiting on the
-         * given condition associated with this synchronizer. Note that
-         * because timeouts and interrupts may occur at any time, the
-         * estimate serves only as an upper bound on the actual number of
-         * waiters.  This method is designed for use in monitoring of the
-         * system state, not for synchronization control.
-         *
-         * @param condition the condition
-         * @return the estimated number of waiting threads
-         * @throws ThreadStateException if exclusive synchronization
-         *         is not held
-         * @throws IllegalArgumentException if the given condition is
-         *         not associated with this synchronizer
-         * @throws NullPointerException if the condition is null
-         */
+        /// <summary>
+        /// Returns an estimate of the number of threads waiting on the given condition
+        /// associated with this synchronizer. Note that because timeouts and interrupts
+        /// may occur at any time, the estimate serves only as an upper bound on the actual
+        /// number of waiters.  This method is designed for use in monitoring of the
+        /// system state, not for synchronization control.
+        /// </summary>
+        /// <returns>
+        /// the estimated number of waiting threads
+        /// </returns>
+        /// <param name='condition'>
+        /// The Condition to retrienve to wait queue length.
+        /// </param>
+        /// <exception cref='ThreadStateException'>
+        /// If the exclusive synchronization is not held.
+        /// </exception>
+        /// <exception cref='ArgumentException'>
+        /// if the given condition is not associated with this synchronizer
+        /// </exception>
+        /// <exception cref='NullReferenceException'>
+        /// If the supplied condition is null.
+        /// </exception>
         public int GetWaitQueueLength(ConditionObject condition)
         {
             if (!Owns(condition))
@@ -1870,18 +1876,16 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 }
             }
     
-            /**
-             * Implements uninterruptible condition wait.
-             * <ol>
-             * <li> Save lock state returned by {@link #getState}.
-             * <li> Invoke {@link #release} with
-             *      saved state as argument, throwing
-             *      ThreadStateException if it fails.
-             * <li> Block until signalled.
-             * <li> Reacquire by invoking specialized version of
-             *      {@link #acquire} with saved state as argument.
-             * </ol>
-             */
+            /// <summary>
+            /// Implements uninterruptible condition wait.
+            /// <list type="bullet">
+            /// <item>Save lock state returned by State</item>
+            /// <item>Invoke Release with saved state as argument, throwing
+            /// ThreadStateException if it fails.
+            /// </item>
+            /// <item>Block until signalled.</item>
+            /// <item>Reacquire by invoking specialized version of Acquire with saved State</item>
+            /// </summary>
             public void AwaitUnInterruptibly()
             {
                 Node node = AddConditionWaiter();
@@ -1990,34 +1994,53 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 }
             }
     
-            /**
-             * Implements timed condition wait.
-             * <ol>
-             * <li> If current thread is interrupted, throw ThreadInterruptedException.
-             * <li> Save lock state returned by {@link #getState}.
-             * <li> Invoke {@link #release} with
-             *      saved state as argument, throwing
-             *      ThreadStateException if it fails.
-             * <li> Block until signalled, interrupted, or timed out.
-             * <li> Reacquire by invoking specialized version of
-             *      {@link #acquire} with saved state as argument.
-             * <li> If interrupted while blocked in step 4, throw ThreadInterruptedException.
-             * </ol>
-             *
-             * @param nanosTimeout the maximum time to wait, in nanoseconds
-             * @return A value less than or equal to zero if the wait has
-             * timed out; otherwise an estimate, that
-             * is strictly less than the <tt>nanosTimeout</tt> argument,
-             * of the time still remaining when this method returned.
-             *
-             * @throws ThreadInterruptedException if the current thread is interrupted (and
-             * interruption of thread suspension is supported).
-             */
+            /// <summary>
+            /// Implements timed condition wait.
+            /// <list type="bullet">
+            /// <item>If current thread is interrupted, throw ThreadInterruptedException.</item>
+            /// <item>Save lock state returned by State</item>
+            /// <item>Invoke Release with saved state as argument, throwing
+            /// ThreadStateException if it fails.
+            /// </item>
+            /// <item>Block until signalled or interrupted or timed out.</item>
+            /// <item>Reacquire by invoking specialized version of Acquire with saved State</item>
+            /// <item>If interrupted while blocked in step 4, throw ThreadInterruptedException.</item>
+            /// </list>
+            /// Throws ThreadInterruptedException if the current thread is interrupted (and
+            /// interruption of thread suspension is supported).
+            /// This method returns a value that is less than or equal to zero if the wait has
+            /// timed out; otherwise an estimate, that is strictly less than the original timeout
+            /// argument, of the time still remaining when this method returned.
+            /// </summary>
+            /// <param name='timeout'>
+            /// the maximum time to wait, in milliseconds.
+            /// </param>
             public int Await(int timeout)
             {
                 return Await(TimeSpan.FromMilliseconds(timeout));
             }
 
+            /// <summary>
+            /// Implements timed condition wait.
+            /// <list type="bullet">
+            /// <item>If current thread is interrupted, throw ThreadInterruptedException.</item>
+            /// <item>Save lock state returned by State</item>
+            /// <item>Invoke Release with saved state as argument, throwing
+            /// ThreadStateException if it fails.
+            /// </item>
+            /// <item>Block until signalled or interrupted or timed out.</item>
+            /// <item>Reacquire by invoking specialized version of Acquire with saved State</item>
+            /// <item>If interrupted while blocked in step 4, throw ThreadInterruptedException.</item>
+            /// </list>
+            /// Throws ThreadInterruptedException if the current thread is interrupted (and
+            /// interruption of thread suspension is supported).
+            /// This method returns a value that is less than or equal to zero if the wait has
+            /// timed out; otherwise an estimate, that is strictly less than the original timeout
+            /// argument, of the time still remaining when this method returned.
+            /// </summary>
+            /// <param name='timeout'>
+            /// the maximum time to wait, as a System.TimeSpan instance.
+            /// </param>
             public int Await(TimeSpan timeout)
             {
                 if (LockSupport.Interrupted())
@@ -2078,29 +2101,26 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
 
                 return (int)(deadline - DateTime.Now).TotalMilliseconds;
             }
-    
-            /**
-             * Implements absolute timed condition wait.
-             * <ol>
-             * <li> If current thread is interrupted, throw ThreadInterruptedException.
-             * <li> Save lock state returned by {@link #getState}.
-             * <li> Invoke {@link #release} with
-             *      saved state as argument, throwing
-             *      ThreadStateException if it fails.
-             * <li> Block until signalled, interrupted, or timed out.
-             * <li> Reacquire by invoking specialized version of
-             *      {@link #acquire} with saved state as argument.
-             * <li> If interrupted while blocked in step 4, throw ThreadInterruptedException.
-             * <li> If timed out while blocked in step 4, return false, else true.
-             * </ol>
-             *
-             * @param deadline the absolute time to wait until
-             * @return <tt>false</tt> if the deadline has
-             * elapsed upon return, else <tt>true</tt>.
-             *
-             * @throws ThreadInterruptedException if the current thread is interrupted (and
-             * interruption of thread suspension is supported).
-             */
+
+            /// <summary>
+            /// Implements timed condition wait.
+            /// <list type="bullet">
+            /// <item>If current thread is interrupted, throw ThreadInterruptedException.</item>
+            /// <item>Save lock state returned by State</item>
+            /// <item>Invoke Release with saved state as argument, throwing
+            /// ThreadStateException if it fails.
+            /// </item>
+            /// <item>Block until signalled or interrupted or timed out.</item>
+            /// <item>Reacquire by invoking specialized version of Acquire with saved State</item>
+            /// <item>If interrupted while blocked in step 4, throw ThreadInterruptedException.</item>
+            /// </list>
+            /// Throws ThreadInterruptedException if the current thread is interrupted (and
+            /// interruption of thread suspension is supported).
+            /// This method returns false if deadline elapsed otherwise returns true.
+            /// </summary>
+            /// <param name='timeout'>
+            /// the deadline in absolute time to wait.
+            /// </param>
             public bool AwaitUntil(DateTime deadline)
             {
                 if (LockSupport.Interrupted())
