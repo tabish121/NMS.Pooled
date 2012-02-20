@@ -25,6 +25,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
     /// </summary>
     public interface ConcurrentMap<K, V> : Map<K, V> where K : class where V : class
     {
+        /// <summary>
+        /// If the specified key is not contained in the map then this method
+        /// will insert the given value into the map using the supplied key.
+        /// </summary>
         V PutIfAbsent(K key, V val);
 
         bool Remove(K key, V expect);

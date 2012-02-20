@@ -86,6 +86,7 @@
     <Compile Include="src\test\csharp\Commons\Collections\Concurrent\Locks\ReentrantLockTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\Concurrent\Locks\ReentrantReadWriteLockTest.cs" />
     <Compile Include="src\test\csharp\Commons\Collections\Lang\ThreadLocalTest.cs" />
+    <Compile Include="src\test\csharp\Commons\Collections\Concurrent\ConcurrentHashMapTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vs2008-pooled.csproj">

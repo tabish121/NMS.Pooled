@@ -110,6 +110,7 @@
     <Compile Include="src\main\csharp\Commons\Collections\Concurrent\locks\ReadWriteLock.cs" />
     <Compile Include="src\main\csharp\Commons\Collections\Concurrent\locks\ReentrantReadWriteLock.cs" />
     <Compile Include="src\main\csharp\Commons\Lang\ThreadLocal.cs" />
+    <Compile Include="src\main\csharp\Commons\Collections\Concurrent\ConcurrentHashMap.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\main\csharp\Util\" />
