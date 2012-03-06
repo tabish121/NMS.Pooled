@@ -1171,22 +1171,20 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             }
     
             /// <summary>
-            /// Set our entry's value and write through to the map. The value to return
-            /// is somewhat arbitrary here. Since a WriteThroughEntry does not necessarily
-            /// track asynchronous changes, the most recent "previous" value could be
-            /// different from what we return (or could even have been removed in which
-            /// case the put will re-establish). We do not and cannot guarantee more.
+            /// Set our entry's value and write through to the map.
             /// </summary>
-            public V SetValue(V value)
+            public override V Value
             {
-                if (value == null)
+                set
                 {
-                    throw new NullReferenceException();
-                }
+                    if (value == null)
+                    {
+                        throw new NullReferenceException();
+                    }
 
-                V v = base.Value = value;
-                parent.Put(Key, value);
-                return v;
+                    base.Value = value;
+                    parent.Put(Key, value);
+                }
             }
         }
     

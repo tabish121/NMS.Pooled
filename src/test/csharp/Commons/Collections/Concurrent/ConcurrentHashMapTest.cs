@@ -546,8 +546,6 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             Assert.IsFalse(map.IsEmpty());
             Entry<Object, Object> entry1 = map.EntrySet().Iterator().Next();
 
-            Console.WriteLine("Entry.Key={0}, Entry.Value={1}", entry1.Key, entry1.Value);
-
             // assert that entry1 is not 16
             Assert.IsTrue(!entry1.Key.Equals(16), "entry is 16, test not valid");
 
@@ -555,13 +553,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             // which just happens to cause entry1 to be cloned in map
             map.Remove(16);
 
-            Console.WriteLine("Entry.Key={0}, Entry.Value={1}", entry1.Key, entry1.Value);
-
             entry1.Value = "XYZ";
 
-            Console.WriteLine("Entry.Key={0}, Entry.Value={1}", entry1.Key, entry1.Value);
-            
-            Assert.IsTrue(map.ContainsValue("XYZ")); // fails
+            Assert.IsTrue(map.ContainsValue("XYZ"));
         }
     }
 }

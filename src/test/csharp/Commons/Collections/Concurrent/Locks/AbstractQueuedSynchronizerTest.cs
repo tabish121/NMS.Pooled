@@ -639,7 +639,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             try
             {
                 sync.Acquire(1);
-                Assert.IsFalse(c.Await(SHORT_DELAY_MS) == 0);
+                Assert.IsFalse(c.Await(SHORT_DELAY_MS) > 0);
                 sync.Release(1);
             }
             catch (Exception e)
