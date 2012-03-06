@@ -112,12 +112,12 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
         {
             try
             {
-                mutex.WaitOne();
+                Thread.SpinWait(200);
                 LockSupport.Park();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                ThreadUnexpectedException();
+                ThreadUnexpectedException(e);
             }
         }
 
@@ -132,7 +132,6 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             {
                 t.Start();
                 t.Interrupt();
-                mutex.ReleaseMutex();
                 t.Join();
             }
             catch (Exception e)
