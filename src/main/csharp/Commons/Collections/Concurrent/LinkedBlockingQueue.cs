@@ -59,16 +59,16 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
         private Node<E> last;
 
         /** Lock held by take, poll, etc */
-        private readonly Mutex takeLock = new Mutex();
+        private readonly ReentrantLock takeLock = new ReentrantLock();
     
         /** Wait queue for waiting takes */
-        private readonly AutoResetEvent notEmpty = new AutoResetEvent(false);
+        private readonly Condition notEmpty;
 
         /** Lock held by put, offer, etc */
-        private readonly Mutex putLock = new Mutex();
+        private readonly ReentrantLock putLock = new ReentrantLock();
     
         /** Wait queue for waiting puts */
-        private readonly AutoResetEvent notFull = new AutoResetEvent(false);
+        private readonly Condition notFull;
 
         /**
          * Signals a waiting take. Called only from put/offer (which do not
@@ -78,7 +78,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
         {
             lock(takeLock)
             {
-                notEmpty.Set();
+                notEmpty.Signal();
             }
         }
 
@@ -89,7 +89,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
         {
             lock(putLock)
             {
-                notFull.Set();
+                notFull.Signal();
             }
         }
     
@@ -120,8 +120,8 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
          */
         private void FullyLock()
         {
-            putLock.WaitOne();
-            takeLock.WaitOne();
+            putLock.Lock();
+            takeLock.Lock();
         }
     
         /**
@@ -129,8 +129,8 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
          */
         private void FullyUnlock()
         {
-            takeLock.ReleaseMutex();
-            putLock.ReleaseMutex();
+            takeLock.UnLock();
+            putLock.UnLock();
         }
 
         private void Unlink(Node<E> p, Node<E> trail)
@@ -147,7 +147,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
 
             if ((int) Interlocked.Decrement(ref count) == capacity)
             {
-                notEmpty.Set();
+                notEmpty.Signal();
             }
         }
 
@@ -159,14 +159,22 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
 
         public LinkedBlockingQueue(int capacity) : base()
         {
-            if (capacity <= 0) throw new ArgumentException();
+            this.notEmpty = takeLock.NewCondition();
+            this.notFull = putLock.NewCondition();
+
+            if (capacity <= 0)
+            {
+                throw new ArgumentException();
+            }
+
             this.capacity = capacity;
             last = head = new Node<E>(null);
         }
 
         public LinkedBlockingQueue(Collection<E> c) : this(Int32.MaxValue)
         {
-            lock(putLock)
+            putLock.Lock();
+            try
             {
                 int n = 0;
                 Iterator<E> iterator = c.Iterator();
@@ -191,6 +199,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                 // Never contended here, so no atomic op is needed.
                 this.count = n;
             }
+            finally
+            {
+                putLock.UnLock();
+            }
         }
 
         public override int Size()
@@ -210,7 +222,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             // Note: convention in all put/take/etc is to preset local var
             // holding count negative to indicate failure unless set.
             int c = -1;
-            Monitor.Enter(putLock);
+            putLock.LockInterruptibly();
             try
             {
                 /*
@@ -223,21 +235,19 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                  */
                 while ((int) Interlocked.Read(ref count) == capacity)
                 {
-                    Monitor.Exit(putLock);
-                    notFull.WaitOne();
-                    Monitor.Enter(putLock);
+                    notFull.Await();
                 }
 
                 Enqueue(e);
                 c = (int) Interlocked.Increment(ref count);
                 if (c + 1 < capacity)
                 {
-                    notFull.Set();
+                    notFull.Signal();
                 }
             }
             finally
             {
-                Monitor.Exit(putLock);
+                putLock.UnLock();
             }
 
             if (c == 0)
@@ -262,7 +272,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                 deadline += timeout;
             }
 
-            Monitor.Enter(putLock);
+            putLock.LockInterruptibly();
             try
             {
                 while ((int) Interlocked.Read(ref count) == capacity)
@@ -272,9 +282,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                         return false;
                     }
 
-                    Monitor.Exit(putLock);
-                    notFull.WaitOne(timeout);
-                    Monitor.Enter(putLock);
+                    notFull.Await(timeout);
 
                     DateTime awakeTime = DateTime.Now;
                     if(awakeTime > deadline)
@@ -291,12 +299,12 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                 c = (int) Interlocked.Increment(ref count);
                 if (c + 1 < capacity)
                 {
-                    notFull.Set();
+                    notFull.Signal();
                 }
             }
             finally
             {
-                Monitor.Exit(putLock);
+                putLock.UnLock();
             }
 
             if (c == 0)
@@ -316,7 +324,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             }
 
             int c = -1;
-            Monitor.Enter(putLock);
+            putLock.Lock();
             try
             {
                 if ((int) Interlocked.Read(ref count) < capacity)
@@ -325,13 +333,13 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                     c = (int) Interlocked.Increment(ref count);
                     if (c + 1 < capacity)
                     {
-                        notFull.Set();
+                        notFull.Signal();
                     }
                 }
             }
             finally
             {
-                Monitor.Exit(putLock);
+                putLock.UnLock();
             }
 
             if (c == 0)
@@ -347,14 +355,12 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             E x;
             int c = -1;
 
-            Monitor.Enter(takeLock);
+            takeLock.LockInterruptibly();
             try
             {
                 while ((int) Interlocked.Read(ref count) == 0)
                 {
-                    Monitor.Exit(takeLock);
-                    notEmpty.WaitOne();
-                    Monitor.Enter(takeLock);
+                    notEmpty.Await();
                 }
 
                 x = Dequeue();
@@ -362,12 +368,12 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
 
                 if (c > 1)
                 {
-                    notEmpty.Set();
+                    notEmpty.Signal();
                 }
             }
             finally
             {
-                Monitor.Exit(takeLock);
+                takeLock.UnLock();
             }
 
             if (c == capacity)
@@ -394,7 +400,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                 deadline += timeout;
             }
 
-            Monitor.Enter(takeLock);
+            takeLock.LockInterruptibly();
             try
             {
                 while ((int) Interlocked.Read(ref count) == 0)
@@ -404,9 +410,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                         return null;
                     }
 
-                    Monitor.Exit(takeLock);
-                    notEmpty.WaitOne(timeout);
-                    Monitor.Enter(takeLock);
+                    notEmpty.Await(timeout);
 
                     DateTime awakeTime = DateTime.Now;
                     if(awakeTime > deadline)
@@ -424,12 +428,12 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
 
                 if (c > 1)
                 {
-                    notEmpty.Set();
+                    notEmpty.Signal();
                 }
             }
             finally
             {
-                Monitor.Exit(takeLock);
+                takeLock.UnLock();
             }
 
             if (c == capacity)
@@ -450,7 +454,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             E x = null;
             int c = -1;
 
-            Monitor.Enter(takeLock);
+            takeLock.Lock();
             try
             {
                 if ((int) Interlocked.Read(ref count) > 0)
@@ -459,13 +463,13 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                     c = (int) Interlocked.Decrement(ref count);
                     if (c > 1)
                     {
-                        Monitor.Pulse(takeLock);
+                        notEmpty.Signal();
                     }
                 }
             }
             finally
             {
-                Monitor.Exit(takeLock);
+                takeLock.UnLock();
             }
 
             if (c == capacity)
@@ -483,7 +487,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                 return null;
             }
 
-            Monitor.Enter(takeLock);
+            takeLock.Lock();
             try
             {
                 Node<E> first = head.next;
@@ -498,7 +502,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             }
             finally
             {
-                Monitor.Exit(takeLock);
+                takeLock.UnLock();
             }
         }
 
@@ -576,7 +580,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
 
                 if ((int) Interlocked.Exchange(ref count, 0) == capacity)
                 {
-                    notFull.Set();
+                    notFull.Signal();
                 }
             }
             finally
@@ -596,7 +600,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             if (ReferenceEquals(c, this)) throw new ArgumentException();
 
             bool signalNotFull = false;
-            Monitor.Enter(takeLock);
+            takeLock.Lock();
             try
             {
                 int n = Math.Min(maxElements, (int) Interlocked.Read(ref count));
@@ -630,7 +634,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             }
             finally
             {
-                Monitor.Exit(takeLock);
+                takeLock.UnLock();
                 if (signalNotFull) SignalNotFull();
             }
         }
