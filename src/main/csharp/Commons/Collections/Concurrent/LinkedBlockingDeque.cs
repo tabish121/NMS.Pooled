@@ -18,6 +18,8 @@
 using System;
 using System.Threading;
 
+using Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks;
+
 namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
 {
     public class LinkedBlockingDeque<E> : AbstractQueue<E>, BlockingDeque<E> where E : class
@@ -74,13 +76,13 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
         private readonly int capacity;
     
         /** Main lock guarding all access */
-        private readonly object mutex = new object();
+        private readonly ReentrantLock mutex = new ReentrantLock();
 
-        /** Condition for waiting takes */
-        private readonly AutoResetEvent notEmpty = new AutoResetEvent(false);
+        /// Condition for waiting takes
+        private readonly Condition notEmpty;
     
-        /** Condition for waiting puts */
-        private readonly AutoResetEvent notFull = new AutoResetEvent(false);
+        /// Condition for waiting puts
+        private readonly Condition notFull;
 
         /// <summary>
         /// Links e as the first element, or returns false is the Deque is full.
@@ -102,7 +104,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                 f.prev = x;
             }
             ++count;
-            notEmpty.Set();
+            notEmpty.Signal();
             return true;
         }
 
@@ -127,7 +129,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             }
 
             ++count;
-            notEmpty.Set();
+            notEmpty.Signal();
             return true;
         }
 
@@ -156,7 +158,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             }
 
             --count;
-            notFull.Set();
+            notFull.Signal();
             return item;
         }
         
@@ -185,7 +187,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             }
 
             --count;
-            notFull.Set();
+            notFull.Signal();
             return item;
         }
         
@@ -212,7 +214,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                 x.item = null;
                 // Don't mess with x's links.  They may still be in use by an iterator.
                 --count;
-                notFull.Set();
+                notFull.Signal();
             }
         }
 
@@ -224,13 +226,19 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
 
         public LinkedBlockingDeque(int capacity) : base()
         {
-            if (capacity <= 0) throw new ArgumentException();
+            this.notEmpty = mutex.NewCondition();
+            this.notFull = mutex.NewCondition();
+
+            if (capacity <= 0)
+            {
+                throw new ArgumentException();
+            }
             this.capacity = capacity;
         }
 
         public LinkedBlockingDeque(Collection<E> c) : this(Int32.MaxValue)
         {
-            Monitor.Enter(mutex);
+            mutex.Lock();
             try
             {
                 Iterator<E> iterator = c.Iterator();
@@ -247,13 +255,13 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             }
             finally
             {
-                Monitor.Exit(mutex);
+                mutex.UnLock();
             }
         }
 
         public LinkedBlockingDeque(System.Collections.Generic.ICollection<E> c) : this(Int32.MaxValue)
         {
-            Monitor.Enter(mutex);
+            mutex.Lock();
             try
             {
                 foreach(E e in c)
@@ -267,7 +275,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             }
             finally
             {
-                Monitor.Exit(mutex);
+                mutex.UnLock();
             }
         }
 
@@ -291,9 +299,14 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
         {
             if (e == null) throw new NullReferenceException();
 
-            lock(mutex)
+            mutex.Lock();
+            try
             {
                 return LinkFirst(e);
+            }
+            finally
+            {
+                mutex.UnLock();
             }
         }
 
@@ -301,9 +314,14 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
         {
             if (e == null) throw new NullReferenceException();
 
-            lock(mutex)
+            mutex.Lock();
+            try
             {
                 return LinkLast(e);
+            }
+            finally
+            {
+                mutex.UnLock();
             }
         }
 
@@ -311,19 +329,17 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
         {
             if (e == null) throw new NullReferenceException();
 
-            Monitor.Enter(mutex);
+            mutex.Lock();
             try
             {
                 while (!LinkFirst(e))
                 {
-                    Monitor.Exit(mutex);
-                    notFull.WaitOne();
-                    Monitor.Enter(mutex);
+                    notFull.Await();
                 }
             }
             finally
             {
-                Monitor.Exit(mutex);
+                mutex.UnLock();
             }
         }
 
@@ -331,19 +347,17 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
         {
             if (e == null) throw new NullReferenceException();
 
-            Monitor.Enter(mutex);
+            mutex.Lock();
             try
             {
                 while (!LinkLast(e))
                 {
-                    Monitor.Exit(mutex);
-                    notFull.WaitOne();
-                    Monitor.Enter(mutex);
+                    notFull.Await();
                 }
             }
             finally
             {
-                Monitor.Exit(mutex);
+                mutex.UnLock();
             }
         }
 
@@ -363,7 +377,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                 deadline += timeout;
             }
 
-            Monitor.Enter(mutex);
+            mutex.LockInterruptibly();
             try
             {
                 while (!LinkFirst(e))
@@ -373,9 +387,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                         return false;
                     }
 
-                    Monitor.Exit(mutex);
-                    notFull.WaitOne(timeout);
-                    Monitor.Enter(mutex);
+                    notFull.Await(timeout);
 
                     DateTime awakeTime = DateTime.Now;
                     if(awakeTime > deadline)
@@ -392,7 +404,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             }
             finally
             {
-                Monitor.Exit(mutex);
+                mutex.UnLock();
             }
         }
 
@@ -412,7 +424,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                 deadline += timeout;
             }
 
-            Monitor.Enter(mutex);
+            mutex.LockInterruptibly();
             try
             {
                 while (!LinkLast(e))
@@ -422,9 +434,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                         return false;
                     }
 
-                    Monitor.Exit(mutex);
-                    notFull.WaitOne(timeout);
-                    Monitor.Enter(mutex);
+                    notFull.Await(timeout);
 
                     DateTime awakeTime = DateTime.Now;
                     if(awakeTime > deadline)
@@ -441,7 +451,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             }
             finally
             {
-                Monitor.Exit(mutex);
+                mutex.UnLock();
             }
         }
 
@@ -461,57 +471,63 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
 
         public virtual E PollFirst()
         {
-            lock(mutex)
+            mutex.Lock();
+            try
             {
                 return UnlinkFirst();
+            }
+            finally
+            {
+                mutex.UnLock();
             }
         }
 
         public virtual E PollLast()
         {
-            lock(mutex)
+            mutex.Lock();
+            try
             {
                 return UnlinkLast();
+            }
+            finally
+            {
+                mutex.UnLock();
             }
         }
 
         public virtual E TakeFirst()
         {
-            Monitor.Enter(mutex);
+            mutex.Lock();
             try
             {
                 E x;
                 while ( (x = UnlinkFirst()) == null)
                 {
-                    Monitor.Exit(mutex);
-                    notEmpty.WaitOne();
-                    Monitor.Enter(mutex);
+                    notEmpty.Await();
                 }
                 return x;
             }
             finally
             {
-                Monitor.Exit(mutex);
+                mutex.UnLock();
             }
         }
 
         public virtual E TakeLast()
         {
-            Monitor.Enter(mutex);
+            mutex.Lock();
             try
             {
                 E x;
                 while ( (x = UnlinkLast()) == null)
                 {
-                    Monitor.Exit(mutex);
-                    notEmpty.WaitOne();
-                    Monitor.Enter(mutex);
+                    notEmpty.Await();
                 }
                 return x;
             }
             finally
             {
-                Monitor.Exit(mutex);
+                mutex.UnLock();
             }
         }
 
@@ -529,7 +545,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                 deadline += timeout;
             }
 
-            Monitor.Enter(mutex);
+            mutex.LockInterruptibly();
             try
             {
                 E x;
@@ -540,9 +556,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                         return null;
                     }
 
-                    Monitor.Exit(mutex);
-                    notEmpty.WaitOne(timeout);
-                    Monitor.Enter(mutex);
+                    notEmpty.Await(timeout);
 
                     DateTime awakeTime = DateTime.Now;
                     if(awakeTime > deadline)
@@ -558,7 +572,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             }
             finally
             {
-                Monitor.Exit(mutex);
+                mutex.UnLock();
             }
         }
 
@@ -576,7 +590,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                 deadline += timeout;
             }
 
-            Monitor.Enter(mutex);
+            mutex.LockInterruptibly();
             try
             {
                 E x;
@@ -587,9 +601,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                         return null;
                     }
 
-                    Monitor.Exit(mutex);
-                    notEmpty.WaitOne(timeout);
-                    Monitor.Enter(mutex);
+                    notEmpty.Await(timeout);
 
                     DateTime awakeTime = DateTime.Now;
                     if(awakeTime > deadline)
@@ -605,7 +617,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             }
             finally
             {
-                Monitor.Exit(mutex);
+                mutex.UnLock();
             }
         }
 
@@ -625,17 +637,27 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
 
         public virtual E PeekFirst()
         {
-            lock(mutex)
+            mutex.Lock();
+            try
             {
                 return (first == null) ? null : first.item;
+            }
+            finally
+            {
+                mutex.UnLock();
             }
         }
 
         public virtual E PeekLast()
         {
-            lock(mutex)
+            mutex.Lock();
+            try
             {
                 return (last == null) ? null : last.item;
+            }
+            finally
+            {
+                mutex.UnLock();
             }
         }
 
@@ -643,7 +665,8 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
         {
             if (o == null) return false;
 
-            lock(mutex)
+            mutex.Lock();
+            try
             {
                 for (Node<E> p = first; p != null; p = p.next)
                 {
@@ -655,13 +678,18 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                 }
                 return false;
             }
+            finally
+            {
+                mutex.UnLock();
+            }
         }
 
         public virtual bool RemoveLastOccurrence(E o)
         {
             if (o == null) return false;
 
-            lock(mutex)
+            mutex.Lock();
+            try
             {
                 for (Node<E> p = last; p != null; p = p.prev)
                 {
@@ -672,6 +700,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                     }
                 }
                 return false;
+            }
+            finally
+            {
+                mutex.UnLock();
             }
         }
 
@@ -778,9 +810,14 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
          */
         public virtual int RemainingCapacity()
         {
-            lock(mutex)
+            mutex.Lock();
+            try
             {
                 return capacity - count;
+            }
+            finally
+            {
+                mutex.UnLock();
             }
         }
 
@@ -794,7 +831,8 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
             if (c == null) throw new NullReferenceException();
             if (ReferenceEquals(c, this)) throw new ArgumentException();
 
-            lock(mutex)
+            mutex.Lock();
+            try
             {
                 int n = Math.Min(maxElements, count);
                 for (int i = 0; i < n; i++)
@@ -803,6 +841,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                     UnlinkFirst();
                 }
                 return n;
+            }
+            finally
+            {
+                mutex.UnLock();
             }
         }
 
@@ -815,9 +857,14 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
         /// </summary>
         public override int Size()
         {
-            lock(mutex)
+            mutex.Lock();
+            try
             {
                 return count;
+            }
+            finally
+            {
+                mutex.UnLock();
             }
         }
     
@@ -830,7 +877,8 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
         {
             if (o == null) return false;
 
-            lock(mutex)
+            mutex.Lock();
+            try
             {
                 for (Node<E> p = first; p != null; p = p.next)
                 {
@@ -841,6 +889,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                 }
 
                 return false;
+            }
+            finally
+            {
+                mutex.UnLock();
             }
         }
 
@@ -854,7 +906,8 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
         /// </summary>
         public override E[] ToArray()
         {
-            lock(mutex)
+            mutex.Lock();
+            try
             {
                 E[] a = new E[count];
                 int k = 0;
@@ -864,19 +917,29 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                 }
                 return a;
             }
+            finally
+            {
+                mutex.UnLock();
+            }
         }
     
         public override String ToString()
         {
-            lock(mutex)
+            mutex.Lock();
+            try
             {
                 return base.ToString();
+            }
+            finally
+            {
+                mutex.UnLock();
             }
         }
     
         public override void Clear()
         {
-            lock(mutex)
+            mutex.Lock();
+            try
             {
                 for (Node<E> f = first; f != null; )
                 {
@@ -889,7 +952,11 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
 
                 first = last = null;
                 count = 0;
-                notFull.Set();
+                notFull.Signal();
+            }
+            finally
+            {
+                mutex.UnLock();
             }
         }
     
@@ -938,16 +1005,22 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                 this.parent = parent;
 
                 // set to initial position
-                lock(parent.mutex)
+                parent.mutex.Lock();
+                try
                 {
                     next = FirstNode();
                     nextItem = (next == null) ? null : next.item;
+                }
+                finally
+                {
+                    parent.mutex.UnLock();
                 }
             }
     
             void Advance()
             {
-                lock(parent.mutex)
+                parent.mutex.Lock();
+                try
                 {
                     // assert next != null;
                     Node<E> s = NextNode(next);
@@ -967,6 +1040,10 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                     }
 
                     nextItem = (next == null) ? null : next.item;
+                }
+                finally
+                {
+                    parent.mutex.UnLock();
                 }
             }
     
@@ -991,12 +1068,17 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
                 if (n == null) throw new IllegalStateException();
 
                 lastRet = null;
-                lock(parent.mutex)
+                parent.mutex.Lock();
+                try
                 {
                     if (n.item != null)
                     {
                         parent.Unlink(n);
                     }
+                }
+                finally
+                {
+                    parent.mutex.UnLock();
                 }
             }
         }

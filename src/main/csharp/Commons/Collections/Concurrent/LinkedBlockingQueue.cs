@@ -17,6 +17,8 @@
 using System;
 using System.Threading;
 
+using Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks;
+
 namespace Apache.NMS.Pooled.Commons.Collections.Concurrent
 {
     public class LinkedBlockingQueue<E> : AbstractQueue<E>, BlockingQueue<E> where E : class
