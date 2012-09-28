@@ -93,17 +93,16 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
              */
             public volatile int waitStatus;
     
-            /**
-             * Link to predecessor node that current node/thread relies on
-             * for checking waitStatus. Assigned during enqueing, and nulled
-             * out (for sake of GC) only upon dequeuing.  Also, upon
-             * cancellation of a predecessor, we short-circuit while
-             * finding a non-cancelled one, which will always exist
-             * because the head node is never cancelled: A node becomes
-             * head only as a result of successful acquire. A
-             * cancelled thread never succeeds in acquiring, and a thread only
-             * cancels itself, not any other node.
-             */
+            /// <summary>
+            /// Link to predecessor node that current node/thread relies on for
+            /// checking waitStatus. Assigned during enqueing, and nulled out
+            /// (for sake of GC) only upon dequeuing.  Also, upon cancellation
+            /// of a predecessor, we short-circuit while finding a non-cancelled
+            /// one, which will always exist because the head node is never
+            /// cancelled: A node becomes head only as a result of successful
+            /// acquire.  A cancelled thread never succeeds in acquiring, and a
+            /// thread only cancels itself, not any other node.
+            /// </summary>
             public volatile Node prev;
     
             /// <summary>
@@ -136,7 +135,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             /// value to indicate shared mode.
             /// </summary>
             public Node nextWaiter;
-    
+                
             /// <summary>
             /// Returns true if node is waiting in shared mode
             /// </summary>
@@ -180,6 +179,14 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 // Used by Condition
                 this.waitStatus = waitStatus;
                 this.thread = thread;
+            }
+
+            public override string ToString()
+            {
+                return "{ hash(" + 
+                       this.GetHashCode() + "), " + 
+                       "thread:" + (this.thread != null ? this.thread.ToString() : "null" + ", ") + 
+                       "waitStatus:" + this.waitStatus + "}";
             }
         }
 
@@ -313,7 +320,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             if (s == null || s.waitStatus > 0)
             {
                 s = null;
-                for (Node t = tail; t != null && t != node; t = t.prev)
+                for (Node t = tail; t != null && !Object.ReferenceEquals(t, node); t = t.prev)
                 {
                     if (t.waitStatus <= 0)
                     {
@@ -347,7 +354,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             for (;;)
             {
                 Node h = head;
-                if (h != null && h != tail)
+                if (h != null && !Object.ReferenceEquals(h, tail))
                 {
                     int ws = h.waitStatus;
                     if (ws == Node.SIGNAL)
@@ -365,7 +372,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 }
 
                 // loop if head changed
-                if (h == head)
+                if (Object.ReferenceEquals(h, head))
                 {
                     break;
                 }
@@ -437,7 +444,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             node.waitStatus = Node.CANCELLED;
     
             // If we are the tail, remove ourselves.
-            if (node == tail && CompareAndSetTail(node, pred))
+            if (Object.ReferenceEquals(node, tail) && CompareAndSetTail(node, pred))
             {
                 CompareAndSetNext(pred, predNext, null);
             }
@@ -446,7 +453,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 // If successor needs signal, try to set pred's next-link
                 // so it will get one. Otherwise wake it up to propagate.
                 int ws;
-                if (pred != head &&
+                if (!Object.ReferenceEquals(pred, head) &&
                     ((ws = pred.waitStatus) == Node.SIGNAL ||
                      (ws <= 0 && CompareAndSetWaitStatus(pred, ws, Node.SIGNAL))) && pred.thread != null)
                 {
@@ -475,10 +482,8 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             int ws = pred.waitStatus;
             if (ws == Node.SIGNAL)
             {
-                /*
-                 * This node has already set status asking a release
-                 * to signal it, so it can safely park.
-                 */
+                // This node has already set status asking a release
+                // to signal it, so it can safely park.
                 return true;
             }
 
@@ -494,11 +499,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             }
             else
             {
-                /*
-                 * waitStatus must be 0 or PROPAGATE.  Indicate that we need a signal,
-                 * but don't park yet.  Caller will need to retry to make sure it
-                 * cannot acquire before parking.
-                 */
+                // waitStatus must be 0 or PROPAGATE.  Indicate that we need a signal,
+                // but don't park yet.  Caller will need to retry to make sure it
+                // cannot acquire before parking.
                 CompareAndSetWaitStatus(pred, ws, Node.SIGNAL);
             }
             return false;
@@ -530,7 +533,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 for (;;)
                 {
                     Node p = node.Predecessor();
-                    if (p == head && TryAcquire(arg))
+                    if (Object.ReferenceEquals(p, head) && TryAcquire(arg))
                     {
                         SetHead(node);
                         p.next = null; // help GC
@@ -565,7 +568,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 for (;;)
                 {
                     Node p = node.Predecessor();
-                    if (p == head && TryAcquire(arg))
+                    if (Object.ReferenceEquals(p, head) && TryAcquire(arg))
                     {
                         SetHead(node);
                         p.next = null; // help GC
@@ -615,7 +618,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 for (;;)
                 {
                     Node p = node.Predecessor();
-                    if (p == head && TryAcquire(arg))
+                    if (Object.ReferenceEquals(p, head) && TryAcquire(arg))
                     {
                         SetHead(node);
                         p.next = null; // help GC
@@ -672,7 +675,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 for (;;)
                 {
                     Node p = node.Predecessor();
-                    if (p == head)
+                    if (Object.ReferenceEquals(p, head))
                     {
                         int r = TryAcquireShared(arg);
                         if (r >= 0)
@@ -715,7 +718,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 for (;;)
                 {
                     Node p = node.Predecessor();
-                    if (p == head)
+                    if (Object.ReferenceEquals(p, head))
                     {
                         int r = TryAcquireShared(arg);
                         if (r >= 0)
@@ -770,7 +773,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
                 for (;;)
                 {
                     Node p = node.Predecessor();
-                    if (p == head)
+                    if (Object.ReferenceEquals(p, head))
                     {
                         int r = TryAcquireShared(arg);
                         if (r >= 0)
@@ -1176,7 +1179,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
          */
         public bool HasQueuedThreads
         {
-            get { return head != tail; }
+            get { return !Object.ReferenceEquals(tail, head); }
         }
     
         /**
@@ -1206,7 +1209,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
          */
         public Thread FirstQueuedThread
         {
-            get { return (head == tail) ? null : FullGetFirstQueuedThread(); }
+            get { return (Object.ReferenceEquals(tail, head)) ? null : FullGetFirstQueuedThread(); }
         }
     
         /// <summary>
@@ -1225,9 +1228,9 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             Node h, s;
             Thread st;
             if (((h = head) != null && (s = h.next) != null &&
-                 s.prev == head && (st = s.thread) != null) ||
+                 Object.ReferenceEquals(s.prev, head) && (st = s.thread) != null) ||
                 ((h = head) != null && (s = h.next) != null &&
-                 s.prev == head && (st = s.thread) != null))
+                 Object.ReferenceEquals(s.prev, head) && (st = s.thread) != null))
             {
                 return st;
             }
@@ -1242,7 +1245,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
     
             Node t = tail;
             Thread firstThread = null;
-            while (t != null && t != head)
+            while (t != null && !Object.ReferenceEquals(t, head))
             {
                 Thread tt = t.thread;
                 if (tt != null)
@@ -1518,7 +1521,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             Node t = tail;
             for (;;)
             {
-                if (t == node)
+                if (Object.ReferenceEquals(t, node))
                 {
                     return true;
                 }
@@ -1772,7 +1775,7 @@ namespace Apache.NMS.Pooled.Commons.Collections.Concurrent.Locks
             {
                 do
                 {
-                    if ( (firstWaiter = first.nextWaiter) == null)
+                    if ((firstWaiter = first.nextWaiter) == null)
                     {
                         lastWaiter = null;
                     }
